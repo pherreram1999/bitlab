@@ -25,7 +25,7 @@ class RetoController extends Controller
         // asigna el reto al usuario actual
         $request->user()->gruposImpartidos()->first()->retos()->create([
             'titulo' => $validated['titulo'],
-            'descripcion' => $validated['descripcion'] ?? 'Sin descripción',
+            'descripcion' => $validated['descripcion'],
             'puntaje' => $validated['puntaje'],
             'opciones' => $validated['opciones'],
             'fecha_limite' => now(),

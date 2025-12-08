@@ -38,5 +38,8 @@ class DatabaseSeeder extends Seeder
             'email'=> 'angeltest@bitlab.com',
             'password' => bcrypt('12345'),
         ]);
+        $this->call([
+            GrupoSeeder::class,
+        ]);
     }
 }
