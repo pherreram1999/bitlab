@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\RetoController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -11,6 +12,10 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
+});
+Route::middleware(['auth'])->group(function () {
+    Route::get('/retos/crear', [RetoController::class, 'create'])->name('retos.create');
+    Route::post('/retos', [RetoController::class, 'store'])->name('retos.store');
 });
 
 Route::middleware([

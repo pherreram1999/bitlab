@@ -26,9 +26,15 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'rol_id',
+        'matricula',
+        'clave',
+        'nombre',
+        'apellido_paterno',
+        'apellido_materno',
         'email',
         'password',
+        'activo',
     ];
 
     /**
@@ -57,6 +63,21 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
+    public function rol(){
+        return $this->belongsTo(Rol::class);
+    }
+
+    public function gruposImpartidos(){
+        return $this->hasMany(Grupo::class,'usuario_id');
+    }
+    public function gruposInscritos(){
+        return $this->belongsToMany(Grupo::class,'inscripciones')
+            ->withPivot('puntos_obtenidos','id')
+            ->withTimestamps();
+    }
+    public function realizaciones(){
+        return $this->hasMany(RealizacionReto::class);
+    }
     protected function casts(): array
     {
         return [
