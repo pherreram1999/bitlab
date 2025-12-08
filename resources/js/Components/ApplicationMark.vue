@@ -8,5 +8,5 @@
 </template>
 
 <script setup lang="ts">
-import bitlabLogo from '../../img/bitlab_icon.webp'
+import bitlabLogo from '../../../public/img/bitlab_icon.webp'
 </script>

@@ -26,9 +26,31 @@ function agregarPregunta() {
     form.opciones.push({
         texto: '',
         info_adicional: '',
-        tipo: 'libre'
+        tipo: 'libre',
+        alternativas: [
+            {inciso: 'A', texto: '',correcta:false},
+            {inciso: 'B', texto: '',correcta:false}
+        ]
     });
     indiceActual.value = form.opciones.length - 1;
+}
+function agregarInciso(){
+    const letras = ['A','B','C','D','E','F'];
+    const pregunta = preguntaActual.value;
+    const siguienteLetra = letras[pregunta.alternativas.length]||'?';
+
+    pregunta.alternativas.push({
+        inciso: siguienteLetra,
+        texto: '',
+        correcta: false
+    });
+}
+function eliminarInciso(index){
+    preguntaActual.value.alternativas.splice(index,1);
+    preguntaActual.value.alternativas.forEach((alt,i)=>{
+        const letras = ['A','B','C','D','E','F'];
+        alt.inciso = letras [i];
+    });
 }
 function eliminarPreguntaActual() {
     if (totalPreguntas.value > 1) {
