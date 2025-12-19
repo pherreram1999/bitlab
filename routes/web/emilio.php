@@ -7,3 +7,5 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('alumnos/retos',[AlumnoController::class,'verRetos'])->name('alumnos.retos');
 Route::get('alumnos/miembros',[AlumnoController::class,'index'])->name('alumnos.miembros');
+Route::get('profesor/miembros',[\App\Http\Controllers\ProfesorController::class,'view'])->name('profesor.miembros');
+Route::get('profesor/retos',[\App\Http\Controllers\ProfesorController::class,'index'])->name('profesor.retos');
