@@ -5,33 +5,25 @@ import { Link } from "@inertiajs/vue3";
 const props = defineProps({
     title: { type: String, default: "Dashboard" },
 
-    // groups: [{ id, nombre }]
+    // groups: [{ id, nombre, ... }]
     groups: { type: Array, default: () => [] },
 
-    // el grupo seleccionado
-    activeGroupId: { type: [Number, String], default: null },
+    // grupo seleccionado (para pintar naranja)
+    activeGroupId: { type: [Number, String, null], default: null },
 
-    // 'retos' | 'miembros' (para armar href de cada grupo en el sidebar)
-    activeTab: { type: String, default: "retos" },
-
-    // base para construir rutas: `${baseGroupHref}/${id}/${activeTab}`
-    // ejemplo alumno: "/alumnos/grupos"
-    // ejemplo profesor: "/profesor/grupos"
-    baseGroupsIndexHref: { type: String, default: "/alumnos/grupos" },
+    // ✅ base real para construir rutas de grupo
+    // alumno:  "/alumnos/grupos"
+    // profesor: "/profesor/grupos" (si algún día lo usas)
+    baseGroupHref: { type: String, default: "/alumnos/grupos" },
 
     // a dónde manda Home
-    hrefHome: { type: String, default: "/dashboard" },
+    hrefHome: { type: String, default: "/alumnos/grupos" },
 });
 
 function groupHref(g) {
     if (!g?.id) return "#";
-
-    // Si estamos en la vista de grupos (no hay activeTab con contexto), vamos al index
-    if (!props.activeTab || props.activeGroupId === null) {
-        return props.baseGroupsIndexHref;
-    }
-
-    return `${props.baseGroupHref}/${g.id}/${props.activeTab}`;
+    // ✅ SIEMPRE manda a retos
+    return `${props.baseGroupHref}/${g.id}/retos`;
 }
 </script>
 
