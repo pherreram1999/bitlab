@@ -1,9 +1,38 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
+import { Link } from "@inertiajs/vue3";
 
 const props = defineProps({
     title: { type: String, default: "Dashboard" },
+
+    // groups: [{ id, nombre }]
+    groups: { type: Array, default: () => [] },
+
+    // el grupo seleccionado
+    activeGroupId: { type: [Number, String], default: null },
+
+    // 'retos' | 'miembros' (para armar href de cada grupo en el sidebar)
+    activeTab: { type: String, default: "retos" },
+
+    // base para construir rutas: `${baseGroupHref}/${id}/${activeTab}`
+    // ejemplo alumno: "/alumnos/grupos"
+    // ejemplo profesor: "/profesor/grupos"
+    baseGroupsIndexHref: { type: String, default: "/alumnos/grupos" },
+
+    // a dónde manda Home
+    hrefHome: { type: String, default: "/dashboard" },
 });
+
+function groupHref(g) {
+    if (!g?.id) return "#";
+
+    // Si estamos en la vista de grupos (no hay activeTab con contexto), vamos al index
+    if (!props.activeTab || props.activeGroupId === null) {
+        return props.baseGroupsIndexHref;
+    }
+
+    return `${props.baseGroupHref}/${g.id}/${props.activeTab}`;
+}
 </script>
 
 <template>
@@ -15,36 +44,40 @@ const props = defineProps({
                 :style="{ width: '351px', background: '#E5EDF9', borderColor: '#BBC2CF' }"
             >
                 <nav class="pt-6 flex flex-col items-center" :style="{ gap: '17px' }">
-
                     <!-- HOME -->
-                    <div class="sidebarBtn sidebarBtn--dark" :style="{ width: '280px', height: '61px' }">
-                        <svg
-                            class="homeIcon"
-                            viewBox="0 0 24 24"
-                            aria-hidden="true"
-                        >
+                    <Link
+                        :href="props.hrefHome"
+                        class="sidebarBtn sidebarBtn--dark"
+                        :style="{ width: '280px', height: '61px' }"
+                    >
+                        <svg class="homeIcon" viewBox="0 0 24 24" aria-hidden="true">
                             <path
                                 d="M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"
                             />
                         </svg>
                         <span class="sidebarText">Home</span>
-                    </div>
+                    </Link>
 
-                    <!-- Grupo seleccionado -->
-                    <div class="sidebarBtn sidebarBtn--selected" :style="{ width: '280px', height: '61px' }">
-                        <span class="sidebarText">Grupo ejemplo 1</span>
-                    </div>
-
-                    <!-- Otros grupos -->
-                    <div
-                        v-for="i in 3"
-                        :key="i"
+                    <!-- GRUPOS -->
+                    <Link
+                        v-for="g in props.groups"
+                        :key="g.id"
+                        :href="groupHref(g)"
                         class="sidebarBtn"
+                        :class="{ 'sidebarBtn--selected': String(props.activeGroupId) === String(g.id) }"
                         :style="{ width: '280px', height: '61px' }"
                     >
-                        <span class="sidebarText">Grupo ejemplo 1</span>
-                    </div>
+                        <span class="sidebarText">{{ g.nombre ?? "Grupo" }}</span>
+                    </Link>
 
+                    <!-- fallback si no hay grupos -->
+                    <div
+                        v-if="!props.groups?.length"
+                        class="sidebarBtn"
+                        :style="{ width: '280px', height: '61px', opacity: 0.75 }"
+                    >
+                        <span class="sidebarText">Sin grupos</span>
+                    </div>
                 </nav>
             </aside>
 
@@ -57,9 +90,6 @@ const props = defineProps({
 </template>
 
 <style scoped>
-/* =========================
-   Sidebar base
-   ========================= */
 .sidebarBtn{
     display:flex;
     align-items:center;
@@ -75,7 +105,9 @@ const props = defineProps({
     color:#000000;
     background:#E5EDF9;
     border:1px solid #BBC2CF;
-    transition: background 120ms ease, color 120ms ease;
+    text-decoration:none;
+
+    transition: background 120ms ease, color 120ms ease, transform 120ms ease;
 }
 
 .sidebarBtn--dark{
@@ -90,9 +122,6 @@ const props = defineProps({
     border:none;
 }
 
-/* =========================
-   Ícono Home
-   ========================= */
 .homeIcon{
     width:35px;
     height:35px;
@@ -100,19 +129,15 @@ const props = defineProps({
     flex-shrink:0;
 }
 
-/* =========================
-   Texto
-   ========================= */
 .sidebarText{
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
 }
 
-/* =========================
-   Hover
-   ========================= */
-aside nav > div:hover{
+/* Hover paleta sidebar */
+aside nav > a.sidebarBtn:hover,
+aside nav > div.sidebarBtn:hover{
     background:#D9D9D9 !important;
     color:#000000 !important;
 }

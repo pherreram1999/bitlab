@@ -28,7 +28,7 @@ class Grupo extends Model
     }
     public function alumnos(): BelongsToMany
     {
-        return $this->belongsToMany(User::class,'inscripciones')
+        return $this->belongsToMany(User::class, 'inscripciones', 'grupo_id', 'usuario_id')
             ->withPivot('puntos_obtenidos','id')
             ->withTimestamps();
     }

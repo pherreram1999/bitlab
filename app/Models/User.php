@@ -71,7 +71,7 @@ class User extends Authenticatable
         return $this->hasMany(Grupo::class,'usuario_id');
     }
     public function gruposInscritos(){
-        return $this->belongsToMany(Grupo::class,'inscripciones')
+        return $this->belongsToMany(Grupo::class, 'inscripciones', 'usuario_id', 'grupo_id')
             ->withPivot('puntos_obtenidos','id')
             ->withTimestamps();
     }

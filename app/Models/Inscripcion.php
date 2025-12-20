@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Inscripcion extends Model
 {
     protected $table = 'inscripciones';
-    protected $fillable = ['ususario_id','grupo_id','puntos_obtenidos'];
+    protected $fillable = ['usuario_id','grupo_id','puntos_obtenidos'];
     public function usuario():BelongsTo
     {
         return $this->belongsTo(User::class);
