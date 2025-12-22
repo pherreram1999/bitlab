@@ -29,7 +29,7 @@ class CreateNewUser implements CreatesNewUsers
             'tipousr' => ['required', Rule::in(['PROFESOR', 'ALUMNO'])],
             'apellido_paterno' => ['required', 'string', 'max:255'],
             'apellido_materno' => ['nullable', 'string', 'max:255'],
-            'matricula' => ['required', 'integer', 'unique:users'],
+            'matricula' => ['required', 'regex:/^\d{10}$/', 'unique:users'],
         ])->validate();
         $rol = Rol::query()->where('clave','=',$input['tipousr'])->firstorfail();
         return User::create([
