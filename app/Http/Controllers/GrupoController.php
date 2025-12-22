@@ -21,6 +21,11 @@ class GrupoController extends Controller
         ]);
     }
 
+    public function create()
+    {
+        return Inertia::render('Grupos/CrearGrupos');
+    }
+
     public function inscribir(Request $request){
         ['codigo' => $clave] = $request->validate([
             'codigo' => 'required|exists:grupos,clave',
@@ -40,14 +45,17 @@ class GrupoController extends Controller
             'nombre' => 'required|string|max:100',
             'descripcion' => 'nullable|string|max:500',
         ]);
+
         do {
             $claveGenerada = mt_rand(10000, 99999);
         } while (Grupo::where('clave', $claveGenerada)->exists());
+
         $request->user()->grupos()->create([
             'nombre' => $validated['nombre'],
             'descripcion' => $validated['descripcion'],
             'clave' => $claveGenerada,
             'concluido' => false,
+            'usuario_id' => Auth::id() // para el usuario creador del grupo
         ]);
         return redirect()->route('dashboard');
     }

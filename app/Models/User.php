@@ -78,6 +78,7 @@ class User extends Authenticatable
         return $this->belongsToMany(
             Grupo::class,
             'inscripciones',
+            'usuario_id',
             'grupo_id'
         );
     }

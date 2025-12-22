@@ -4,8 +4,7 @@ import { Link } from "@inertiajs/vue3";
 import SidebarOnlyLayout from "@/Layouts/SidebarOnlyLayout.vue";
 import JoinGroupModal from "@/Components/JoinGroupModal.vue";
 import {useUser} from "@/composable/useUser";
-import DialogModal from "@/Components/DialogModal.vue";
-
+import {router} from '@inertiajs/vue3'
 
 interface Grupo {
     id: number;
@@ -29,6 +28,9 @@ const showForm = ref(false);
 const hasGroups = computed(() => (props.grupos?.length ?? 0) > 0);
 
 function openForm() {
+    // en caso de que sea profesor, lo mandamos a la vista de crear
+    if (user.rol.clave === 'PROFESOR')
+        return router.visit('/grupos/crear')
     showForm.value = true;
 }
 

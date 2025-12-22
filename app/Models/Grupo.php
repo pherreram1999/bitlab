@@ -10,12 +10,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Grupo extends Model
 {
     protected $fillable = [
-        'usuario_id',
         'clave',
         'nombre',
         'descripcion',
         'portada',
         'concluido',
+        'usuario_id'
     ];
     protected $casts = [
         'concluido' => 'boolean',
