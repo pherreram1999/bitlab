@@ -16,7 +16,7 @@ class GrupoController extends Controller
         // dependiendo el ROL
 
 
-        return Inertia::render('Grupos', [
+        return Inertia::render('GruposDashboard', [
             'grupos' => $user->grupos
         ]);
     }
