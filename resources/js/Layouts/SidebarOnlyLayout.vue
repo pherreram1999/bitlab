@@ -2,21 +2,24 @@
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/vue3";
 import { ref } from "vue";
+import { usePage } from "@inertiajs/vue3";
+
+const page = usePage()
+
+
+const groups = page.props.grupos
+
+
 
 const isMobileMenuOpen = ref(false);
 
+
+
 const props = defineProps({
     title: { type: String, default: "Dashboard" },
-
-    // groups: [{ id, nombre, ... }]
-    groups: { type: Array, default: () => [] },
-
     // grupo seleccionado (para pintar naranja)
     activeGroupId: { type: [Number, String, null], default: null },
 
-    // ✅ base real para construir rutas de grupo
-    // alumno:  "/alumnos/grupos"
-    // profesor: "/profesor/grupos" (si algún día lo usas)
     baseGroupHref: { type: String, default: "/alumnos/grupos" },
 
     // a dónde manda Home
@@ -71,9 +74,9 @@ function groupHref(g) {
 
                     <!-- GRUPOS -->
                     <Link
-                        v-for="g in props.groups"
+                        v-for="g in groups"
                         :key="g.id"
-                        :href="groupHref(g)"
+                        :href="`/grupo/${g.id}`"
                         class="sidebarBtn"
                         :class="{ 'sidebarBtn--selected': String(props.activeGroupId) === String(g.id) }" @click="isMobileMenuOpen = false"
                         :style="{ width: '280px', height: '61px' }"
@@ -83,7 +86,7 @@ function groupHref(g) {
 
                     <!-- fallback si no hay grupos -->
                     <div
-                        v-if="!props.groups?.length"
+                        v-if="!groups?.length"
                         class="sidebarBtn"
                         :style="{ width: '280px', height: '61px', opacity: 0.75 }"
                     >

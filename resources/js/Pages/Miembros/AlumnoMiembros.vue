@@ -77,45 +77,46 @@ const avgPercent = computed(() => props.avgPercent ?? 0);
         baseGroupHref="/alumnos/grupos"
 
     >
-        <GruposRightLayout
-            activeTab="miembros"
-            :hrefRetos="hrefRetosFinal"
-            :hrefMiembros="hrefMiembrosFinal"
-            :groupCode="groupCode"
-            :groupName="groupName"
-            :groupDate="groupDate"
-            :studentName="studentName"
-            :totalPoints="totalPoints"
-            :avgPercent="avgPercent"
-        >
-            <!-- Bloque Miembros -->
-            <section class="mt-4 rounded-xl" :style="{ width: '850px', background: '#E5EDF9' }">
-                <div class="space-y-5">
-                    <div
-                        v-for="(m, idx) in membersList"
-                        :key="m.id ?? idx"
-                        class="memberCard"
-                        :style="{ width: '850px', height: '69px' }"
-                    >
-                        <div class="grid grid-cols-12 items-center h-full px-8">
-                            <div class="col-span-7 text-center font-semibold" :style="{ color: '#000000' }">
-                                {{ m.name ?? m.nombre }}
-                            </div>
+        <div class="space-y-5">
+            <div
+                v-for="(m, idx) in membersList"
+                :key="m.id ?? idx"
+                class="memberCard"
+                :style="{ width: '850px', height: '69px' }"
+            >
+                <div class="grid grid-cols-12 items-center h-full px-8">
+                    <div class="col-span-7 text-center font-semibold" :style="{ color: '#000000' }">
+                        {{ m.name ?? m.nombre }}
+                    </div>
 
-                            <div class="col-span-2 text-center font-semibold" :style="{ color: '#000000' }">
-                                {{ m.percent ?? (m.points !== undefined ? (m.points + ' pts') : '0%') }}
-                            </div>
+                    <div class="col-span-2 text-center font-semibold" :style="{ color: '#000000' }">
+                        {{ m.percent ?? (m.points !== undefined ? (m.points + ' pts') : '0%') }}
+                    </div>
 
-                            <div class="col-span-3 flex justify-end">
-                                <svg viewBox="0 0 24 24" class="w-10 h-10" :style="{ fill: '#D9D9D9' }">
-                                    <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
-                                </svg>
-                            </div>
-                        </div>
+                    <div class="col-span-3 flex justify-end">
+                        <svg viewBox="0 0 24 24" class="w-10 h-10" :style="{ fill: '#D9D9D9' }">
+                            <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                        </svg>
                     </div>
                 </div>
-            </section>
-        </GruposRightLayout>
+            </div>
+        </div>
+
+<!--        <GruposRightLayout-->
+<!--            activeTab="miembros"-->
+<!--            :hrefRetos="hrefRetosFinal"-->
+<!--            :hrefMiembros="hrefMiembrosFinal"-->
+<!--            :groupCode="groupCode"-->
+<!--            :groupName="groupName"-->
+<!--            :groupDate="groupDate"-->
+<!--            :studentName="studentName"-->
+<!--            :totalPoints="totalPoints"-->
+<!--            :avgPercent="avgPercent"-->
+<!--        >-->
+<!--            &lt;!&ndash; Bloque Miembros &ndash;&gt;-->
+<!--            <section class="mt-4 rounded-xl" :style="{ width: '850px', background: '#E5EDF9' }">-->
+<!--            </section>-->
+<!--        </GruposRightLayout>-->
     </SidebarOnlyLayout>
 </template>
 

@@ -16,9 +16,7 @@ class GrupoController extends Controller
         // dependiendo el ROL
 
 
-        return Inertia::render('GruposDashboard', [
-            'grupos' => $user->grupos
-        ]);
+        return Inertia::render('GruposDashboard');
     }
 
     public function create()
@@ -59,5 +57,13 @@ class GrupoController extends Controller
             'usuario_id' => Auth::id() // para el usuario creador del grupo
         ]);
         return redirect()->route('dashboard');
+    }
+
+
+    function show($id){
+        // mostramos los datos
+        $grupo = Grupo::query()->findOrFail($id);
+
+        return Inertia::render('Grupo', ['grupo' => $grupo]);
     }
 }

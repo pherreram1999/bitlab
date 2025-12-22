@@ -5,15 +5,7 @@ import SidebarOnlyLayout from "@/Layouts/SidebarOnlyLayout.vue";
 import JoinGroupModal from "@/Components/JoinGroupModal.vue";
 import {useUser} from "@/composable/useUser";
 import {router} from '@inertiajs/vue3'
-
-interface Grupo {
-    id: number;
-    clave: string;
-    nombre: string;
-    portada: string;
-    descripcion: string;
-    created_at: string;
-}
+import {Grupo} from "@/interfaces";
 
 const user = useUser()
 
@@ -48,13 +40,13 @@ function fmtDate(d) {
         hrefHome="/dashboard">
 
         <div class="mx-auto px-4 md:px-0">
-            <section class="w-full max-w-[850px]">
-                <div class="groupsGrid">
+            <section class="w-full">
+                <div class="grid grid-cols-4 gap-4">
                     <Link
                         v-for="g in grupos"
                         :key="g.id"
                         class="groupCard"
-                        :href="`/alumnos/grupos/${g.id}/retos`"
+                        :href="`/grupo/${g.id}`"
                     >
                         <div class="cardInner">
                             <div class="cardText">
@@ -92,7 +84,9 @@ function fmtDate(d) {
 
             <!-- FAB "+" más pequeño -->
             <!-- dependiendo -->
-            <button class="fabBtn" type="button" aria-label="Unirse a un grupo" @click="openForm">
+            <button class="fabBtn" type="button"
+                    aria-label="Unirse a un grupo"
+                    @click="openForm">
                 <span class="plusV"></span>
                 <span class="plusH"></span>
             </button>
