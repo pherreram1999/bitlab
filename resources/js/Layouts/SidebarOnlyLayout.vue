@@ -1,6 +1,9 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/vue3";
+import { ref } from "vue";
+
+const isMobileMenuOpen = ref(false);
 
 const props = defineProps({
     title: { type: String, default: "Dashboard" },
@@ -29,12 +32,28 @@ function groupHref(g) {
 
 <template>
     <app-layout :title="props.title">
-        <div class="min-h-screen flex" :style="{ background: '#E5EDF9' }">
+        <div class="min-h-screen flex flex-col md:flex-row" :style="{ background: '#E5EDF9' }">
+            <!-- MOBILE HEADER -->
+            <div class="md:hidden flex items-center justify-between p-4 border-b border-[#BBC2CF] bg-[#E5EDF9]">
+                <span class="font-bold text-lg text-[#2B2E36]">{{ props.title }}</span>
+                <button @click="isMobileMenuOpen = !isMobileMenuOpen" class="p-2 rounded-md bg-[#2B2E36] text-white">
+                    <svg v-if="!isMobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                    <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+            <!-- MOBILE BACKDROP OVERLAY -->
+            <div v-if="isMobileMenuOpen" class="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm" @click="isMobileMenuOpen = false"></div>
             <!-- SIDEBAR -->
             <aside
-                class="border-r shrink-0"
-                :style="{ width: '351px', background: '#E5EDF9', borderColor: '#BBC2CF' }"
+                class="fixed inset-y-0 left-0 z-50 w-[280px] sm:w-[351px] transform transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:z-auto md:border-r" :class="[isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full']"
+                :style="{ background: '#E5EDF9', borderColor: '#BBC2CF' }"
             >
+                <!-- Mobile Close Button -->
+                <div class="flex justify-end p-4 md:hidden">
+                    <button @click="isMobileMenuOpen = false" class="p-2 text-[#2B2E36]">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
                 <nav class="pt-6 flex flex-col items-center" :style="{ gap: '17px' }">
                     <!-- HOME -->
                     <Link
@@ -56,7 +75,7 @@ function groupHref(g) {
                         :key="g.id"
                         :href="groupHref(g)"
                         class="sidebarBtn"
-                        :class="{ 'sidebarBtn--selected': String(props.activeGroupId) === String(g.id) }"
+                        :class="{ 'sidebarBtn--selected': String(props.activeGroupId) === String(g.id) }" @click="isMobileMenuOpen = false"
                         :style="{ width: '280px', height: '61px' }"
                     >
                         <span class="sidebarText">{{ g.nombre ?? "Grupo" }}</span>
@@ -73,8 +92,8 @@ function groupHref(g) {
                 </nav>
             </aside>
 
-            <!-- CONTENIDO A LA DERECHA -->
-            <main class="flex-1 p-8">
+            <!-- contenido principal -->
+            <main class="flex-1 p-4 md:p-8">
                 <slot />
             </main>
         </div>

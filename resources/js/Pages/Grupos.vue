@@ -58,8 +58,8 @@ function fmtDate(d) {
         :activeGroupId="null"
         hrefHome="/dashboard">
 
-        <div class="mx-auto">
-            <section :style="{ width: '850px' }">
+        <div class="mx-auto px-4 md:px-0">
+            <section class="w-full max-w-[850px]">
                 <div class="groupsGrid">
                     <Link
                         v-for="g in props.grupos"
@@ -201,10 +201,10 @@ function fmtDate(d) {
 /* FAB más pequeño: 84x84 */
 .fabBtn{
     position: fixed;
-    right: 70px;
-    bottom: 70px;
-    width: 84px;
-    height: 84px;
+    right: 20px;
+    bottom: 20px;
+    width: 64px;
+    height: 64px;
     border-radius: 999px;
     background: #3B3F48;
     border: none;
@@ -212,22 +212,43 @@ function fmtDate(d) {
     display:flex;
     align-items:center;
     justify-content:center;
+    z-index: 50;
+}
+
+@media (min-width: 768px) {
+    .fabBtn {
+        right: 70px;
+        bottom: 70px;
+        width: 84px;
+        height: 84px;
+    }
 }
 
 /* Cruz más pequeña */
 .plusV{
     position:absolute;
-    width: 8px;
-    height: 44px;
+    width: 6px;
+    height: 32px;
     background:#E17101;
     border-radius: 10px;
 }
 .plusH{
     position:absolute;
-    width: 44px;
-    height: 8px;
+    width: 32px;
+    height: 6px;
     background:#E17101;
     border-radius: 10px;
+}
+
+@media (min-width: 768px) {
+    .plusV {
+        width: 8px;
+        height: 44px;
+    }
+    .plusH {
+        width: 44px;
+        height: 8px;
+    }
 }
 
 /* Modal */
@@ -238,11 +259,13 @@ function fmtDate(d) {
     display:flex;
     align-items:center;
     justify-content:center;
-    padding: 24px;
+    padding: 16px;
+    z-index: 100;
 }
 
 .modalCard{
-    width: 520px;
+    width: 100%;
+    max-width: 520px;
     background:#FFFFFF;
     border-radius: 16px;
     border: 1px solid #BBC2CF;
