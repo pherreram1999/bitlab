@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { Link, useForm } from "@inertiajs/vue3";
+import { Link } from "@inertiajs/vue3";
 import SidebarOnlyLayout from "@/Layouts/SidebarOnlyLayout.vue";
+import JoinGroupModal from "@/Components/JoinGroupModal.vue";
 
 
 interface Grupo {
@@ -19,30 +20,10 @@ const props = defineProps<Props>()
 
 const showJoin = ref(false);
 
-const form = useForm({
-    codigo: "",
-});
-
 const hasGroups = computed(() => (props.grupos?.length ?? 0) > 0);
 
 function openJoin() {
     showJoin.value = true;
-    form.clearErrors();
-    form.codigo = "";
-}
-
-function closeJoin() {
-    showJoin.value = false;
-}
-
-function submitJoin() {
-    form.post("/alumnos/grupos/unirse", {
-        preserveScroll: true,
-        onSuccess: () => {
-            // si tu controller redirige a retos del grupo, el modal ya no importa
-            showJoin.value = false;
-        },
-    });
 }
 
 function fmtDate(d) {
@@ -88,6 +69,7 @@ function fmtDate(d) {
 
                     <div v-if="!hasGroups" class="emptyBox">
                         <h2 class="emptyTitle">Aún no tienes grupos</h2>
+
                         <p class="emptyText">
                             Únete con el botón <span :style="{ color: '#E17101', fontWeight: 800 }">+</span>
                             usando el código que te compartió tu profesor.
@@ -102,47 +84,7 @@ function fmtDate(d) {
                 <span class="plusH"></span>
             </button>
 
-            <!-- MODAL -->
-            <div v-if="showJoin" class="modalOverlay" @click.self="closeJoin">
-                <div class="modalCard">
-                    <div class="modalHeader">
-                        <h2 class="modalTitle">Unirme a un grupo</h2>
-                        <button class="modalClose" type="button" aria-label="Cerrar" @click="closeJoin">×</button>
-                    </div>
-
-                    <p class="modalText">
-                        Ingresa el código del grupo que tu profesor te compartió.
-                    </p>
-
-                    <div class="mt-5">
-                        <label class="block font-semibold mb-2" :style="{ color: '#000000' }">
-                            Código del grupo
-                        </label>
-
-                        <input
-                            v-model="form.codigo"
-                            type="text"
-                            class="modalInput"
-                            placeholder="Ej: 18473938"
-                            @keydown.enter.prevent="submitJoin"
-                        />
-
-                        <div v-if="form.errors.codigo" class="modalError">
-                            {{ form.errors.codigo }}
-                        </div>
-                    </div>
-
-                    <div class="modalActions">
-                        <button class="btnSecondary" type="button" @click="closeJoin">
-                            Cancelar
-                        </button>
-
-                        <button class="btnPrimary" type="button" :disabled="form.processing" @click="submitJoin">
-                            Unirme
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <JoinGroupModal :show="showJoin" @close="showJoin = false" />
         </div>
     </SidebarOnlyLayout>
 </template>
@@ -249,102 +191,6 @@ function fmtDate(d) {
         width: 44px;
         height: 8px;
     }
-}
-
-/* Modal */
-.modalOverlay{
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.25);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding: 16px;
-    z-index: 100;
-}
-
-.modalCard{
-    width: 100%;
-    max-width: 520px;
-    background:#FFFFFF;
-    border-radius: 16px;
-    border: 1px solid #BBC2CF;
-    padding: 18px 18px 16px 18px;
-}
-
-.modalHeader{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-}
-
-.modalTitle{
-    font-size: 22px;
-    font-weight: 800;
-    color:#2B2E36;
-}
-
-.modalClose{
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    border: 1px solid #BBC2CF;
-    background: #E5EDF9;
-    cursor: pointer;
-    font-size: 22px;
-    line-height: 0;
-}
-
-.modalText{
-    margin-top: 10px;
-    color:#4B556B;
-}
-
-.modalInput{
-    width: 100%;
-    border-radius: 12px;
-    padding: 12px 14px;
-    border: 1px solid #BBC2CF;
-    background: #E5EDF9;
-    color: #000000;
-    outline: none;
-}
-
-.modalError{
-    margin-top: 8px;
-    color: #E17101;
-    font-size: 13px;
-    font-weight: 700;
-}
-
-.modalActions{
-    margin-top: 16px;
-    display:flex;
-    justify-content:flex-end;
-    gap: 10px;
-}
-
-.btnSecondary{
-    padding: 10px 14px;
-    border-radius: 12px;
-    border: 1px solid #3B3F48;
-    background: #FFFFFF;
-    font-weight: 800;
-    cursor: pointer;
-}
-
-.btnPrimary{
-    padding: 10px 16px;
-    border-radius: 12px;
-    border: none;
-    background: #E17101;
-    color: #FFFFFF;
-    font-weight: 900;
-    cursor: pointer;
-}
-.btnPrimary:disabled{
-    opacity: 0.7;
-    cursor: not-allowed;
 }
 
 /* Responsive */
