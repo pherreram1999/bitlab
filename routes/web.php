@@ -21,7 +21,7 @@ Route::middleware([
 ])->group(function () {
     Route::get('dashboard', GrupoController::class)
         ->name('dashboard');
-    Route::post('grupos/inscribir',[GrupoController::class,'inscribir'])
+    Route::post('grupos/inscribir',[GrupoController::class,'inscribir']);
     //Route::get('/dashboard', function () {
     //    return Inertia::render('Dashboard');
     // })->name('dashboard');
