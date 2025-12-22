@@ -1,5 +1,5 @@
 <script setup>
-import { useForm } from '@inertiajs/vue3';
+import { useForm, Link } from '@inertiajs/vue3';
 import bitlabLogo from '../../../img/bitlab_icon.webp';
 import bitlabIsologo from '../../../img/bitLab_isologo.webp';
 
@@ -59,9 +59,12 @@ function guardarGrupo() {
                     </div>
 
                     <div class="flex justify-between gap-4 mt-8">
-                        <button class="flex-1 px-6 py-2 rounded-lg border border-gray-400 text-gray-900 hover:bg-gray-50 transition font-medium">
+                        <Link
+                            :href="route('dashboard')"
+                            class="flex-1 px-6 py-2 rounded-lg border border-gray-400 text-gray-900 hover:bg-gray-50 transition font-medium text-center "
+                        >
                             Cancelar
-                        </button>
+                        </Link>
 
                         <button
                             @click="guardarGrupo"
