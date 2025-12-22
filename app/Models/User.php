@@ -74,7 +74,7 @@ class User extends Authenticatable
         return $this->belongsTo(Rol::class);
     }
 
-    public function grupos_impartidos(){
+    public function grupos(){
         return $this->belongsToMany(
             Grupo::class,
             'inscripciones',
@@ -87,16 +87,7 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
-    public function grupos(){
-        // dependiendo el rol retorna los grupos
-        /** @var Rol $rol */
-        $rol = $this->rol;
 
-        if ($rol->clave === 'PROFESOR')
-            return $this->grupos_inscritos();
-        // de lo contrario es un alumno
-        return $this->grupos_impartidos();
-    }
     public function realizaciones(){
         return $this->hasMany(RealizacionReto::class);
     }

@@ -8,6 +8,7 @@ import DialogModal from "@/Components/DialogModal.vue";
 
 
 interface Grupo {
+    id: number;
     clave: string;
     nombre: string;
     portada: string;

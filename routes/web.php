@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GrupoController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -26,8 +26,9 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('dashboard', DashboardController::class)
+    Route::get('dashboard', GrupoController::class)
         ->name('dashboard');
+    Route::post('grupos/inscribir',[GrupoController::class,'inscribir'])
     //Route::get('/dashboard', function () {
     //    return Inertia::render('Dashboard');
     // })->name('dashboard');
