@@ -17,7 +17,10 @@ class Grupo extends Model
         'portada',
         'concluido',
     ];
-    protected $casts = ['concluido' => 'boolean'];
+    protected $casts = [
+        'concluido' => 'boolean',
+        'created_at' => 'datetime:d/m/Y H:i:s',
+    ];
     public function profesor(): BelongsTo
     {
         return $this->belongsTo(User::class,'usuario_id');

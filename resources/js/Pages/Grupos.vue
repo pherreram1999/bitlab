@@ -3,6 +3,8 @@ import { computed, ref } from "vue";
 import { Link } from "@inertiajs/vue3";
 import SidebarOnlyLayout from "@/Layouts/SidebarOnlyLayout.vue";
 import JoinGroupModal from "@/Components/JoinGroupModal.vue";
+import {useUser} from "@/composable/useUser";
+import DialogModal from "@/Components/DialogModal.vue";
 
 
 interface Grupo {
@@ -10,7 +12,10 @@ interface Grupo {
     nombre: string;
     portada: string;
     descripcion: string;
+    created_at: string;
 }
+
+const user = useUser()
 
 interface Props {
     grupos: Grupo[]
@@ -18,12 +23,12 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const showJoin = ref(false);
+const showForm = ref(false);
 
 const hasGroups = computed(() => (props.grupos?.length ?? 0) > 0);
 
-function openJoin() {
-    showJoin.value = true;
+function openForm() {
+    showForm.value = true;
 }
 
 function fmtDate(d) {
@@ -35,7 +40,7 @@ function fmtDate(d) {
 <template>
     <SidebarOnlyLayout
         title="Grupos"
-        :groups="props.grupos"
+        :groups="grupos"
         :activeGroupId="null"
         hrefHome="/dashboard">
 
@@ -43,7 +48,7 @@ function fmtDate(d) {
             <section class="w-full max-w-[850px]">
                 <div class="groupsGrid">
                     <Link
-                        v-for="g in props.grupos"
+                        v-for="g in grupos"
                         :key="g.id"
                         class="groupCard"
                         :href="`/alumnos/grupos/${g.id}/retos`"
@@ -51,7 +56,7 @@ function fmtDate(d) {
                         <div class="cardInner">
                             <div class="cardText">
                                 <div class="cardTitle">{{ g.nombre ?? "Grupo" }}</div>
-                                <div class="cardDate">{{ fmtDate(g.fecha ?? g.created_at) }}</div>
+                                <div class="cardDate">{{ g.created_at }}</div>
                             </div>
 
                             <button
@@ -70,21 +75,26 @@ function fmtDate(d) {
                     <div v-if="!hasGroups" class="emptyBox">
                         <h2 class="emptyTitle">Aún no tienes grupos</h2>
 
-                        <p class="emptyText">
+                        <p v-if="user.rol.clave === 'ALUMNO'" class="emptyText">
                             Únete con el botón <span :style="{ color: '#E17101', fontWeight: 800 }">+</span>
                             usando el código que te compartió tu profesor.
+                        </p>
+
+                        <p v-if="user.rol.clave === 'PROFESOR'">
+                            Para crear un grupo da click en botón de +
                         </p>
                     </div>
                 </div>
             </section>
 
             <!-- FAB "+" más pequeño -->
-            <button class="fabBtn" type="button" aria-label="Unirse a un grupo" @click="openJoin">
+            <!-- dependiendo -->
+            <button class="fabBtn" type="button" aria-label="Unirse a un grupo" @click="openForm">
                 <span class="plusV"></span>
                 <span class="plusH"></span>
             </button>
 
-            <JoinGroupModal :show="showJoin" @close="showJoin = false" />
+            <JoinGroupModal v-if="user.rol.clave === 'ALUMNO'" :show="showForm" @close="showForm = false" />
         </div>
     </SidebarOnlyLayout>
 </template>

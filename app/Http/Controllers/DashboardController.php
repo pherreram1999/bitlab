@@ -14,6 +14,7 @@ class DashboardController extends Controller
         $user = Auth::user();
         // dependiendo el ROL
 
+
         return Inertia::render('Grupos', [
             'grupos' => $user->grupos
         ]);
