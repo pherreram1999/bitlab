@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
         ]);
         $rolAdmin = Rol::where('nombre', 'Administrador')->first();
         $rolProfesor = Rol::where('nombre', 'Profesor')->first();
-        $admin = User::query()->create([
+        User::query()->create([
             'rol_id' => $rolAdmin->id,
             'matricula' => '12345678',
             'nombre' => 'admin',
@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@bitlab.com',
             'password' => bcrypt('12345'),
         ]);
-        $profesor = User::query()->create([
+        User::query()->create([
             'rol_id' => $rolProfesor->id,
             'matricula' => '123456789',
             'nombre' => 'Angel',

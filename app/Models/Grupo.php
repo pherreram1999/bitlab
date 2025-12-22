@@ -10,14 +10,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Grupo extends Model
 {
     protected $fillable = [
-        'usuario_id',
         'clave',
         'nombre',
         'descripcion',
         'portada',
         'concluido',
+        'usuario_id'
     ];
-    protected $casts = ['concluido' => 'boolean'];
+    protected $casts = [
+        'concluido' => 'boolean',
+        'created_at' => 'datetime:d/m/Y H:i:s',
+    ];
     public function profesor(): BelongsTo
     {
         return $this->belongsTo(User::class,'usuario_id');

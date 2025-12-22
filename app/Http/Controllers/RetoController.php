@@ -23,7 +23,7 @@ class RetoController extends Controller
             'fecha_limite' => 'nullable|datetime',
         ]);
         // asigna el reto al usuario actual
-        $request->user()->gruposImpartidos()->first()->retos()->create([
+        $request->user()->grupos_impartidos()->first()->retos()->create([
             'titulo' => $validated['titulo'],
             'descripcion' => $validated['descripcion'],
             'puntaje' => $validated['puntaje'],

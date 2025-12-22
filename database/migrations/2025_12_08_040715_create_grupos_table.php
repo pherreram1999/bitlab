@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('grupos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('usuario_id')->references('id')->on('users')->onDelete('cascade');
-            $table->string('clave',50);
+            $table->string('clave',50)->unique();
             $table->string('nombre',100);
-            $table->string('portada'); // path
+            $table->string('portada')->nullable(); // path
             $table->string('descripcion')-> nullable();
             $table->boolean('concluido')->default(false);
             $table->timestamps();

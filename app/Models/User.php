@@ -37,6 +37,10 @@ class User extends Authenticatable
         'activo',
     ];
 
+    protected $with = [
+        'rol'
+    ];
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -49,6 +53,8 @@ class User extends Authenticatable
         'two_factor_secret',
     ];
 
+
+
     /**
      * The accessors to append to the model's array form.
      *
@@ -58,23 +64,31 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
+
+
     /**
      * Get the attributes that should be cast.
      *
-     * @return array<string, string>
      */
     public function rol(){
         return $this->belongsTo(Rol::class);
     }
 
-    public function gruposImpartidos(){
-        return $this->hasMany(Grupo::class,'usuario_id');
+    public function grupos(){
+        return $this->belongsToMany(
+            Grupo::class,
+            'inscripciones',
+            'usuario_id',
+            'grupo_id'
+        );
     }
-    public function gruposInscritos(){
+    public function grupos_inscritos(){
         return $this->belongsToMany(Grupo::class, 'inscripciones', 'usuario_id', 'grupo_id')
             ->withPivot('puntos_obtenidos','id')
             ->withTimestamps();
     }
+
+
     public function realizaciones(){
         return $this->hasMany(RealizacionReto::class);
     }
