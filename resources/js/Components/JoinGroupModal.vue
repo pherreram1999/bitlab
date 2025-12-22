@@ -7,12 +7,18 @@ import SecondaryButton from "@/Components/SecondaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import InputError from "@/Components/InputError.vue";
+import {useAxios} from "@/composable/useAxios.ts";
+import {router} from "@inertiajs/vue3";
 
 const props = defineProps({
     show: Boolean,
+    onSuccess: Function
 });
 
 const emit = defineEmits(["close"]);
+
+
+const client = useAxios()
 
 const form = useForm({
     codigo: "",
@@ -26,12 +32,11 @@ watch(() => props.show, (newVal) => {
 });
 
 function submitJoin() {
-    form.post("/alumnos/grupos/unirse", {
-        preserveScroll: true,
-        onSuccess: () => {
-            emit("close");
-        },
-    });
+    client.post('/grupos/inscribir',{codigo: form.codigo})
+        .then(()=>{
+            emit('close')
+            router.reload()
+        })
 }
 
 function close() {

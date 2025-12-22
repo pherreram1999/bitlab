@@ -31,7 +31,8 @@ class GrupoController extends Controller
             'codigo' => 'required|exists:grupos,clave',
         ]);
         // buscamos el grupo
-        $grupo = Grupo::query()->find($clave);
+        $grupo = Grupo::query()->where('clave', $clave)
+            ->first();
         /** @var User $user */
         $user = Auth::user();
         $user->grupos()->attach($grupo);
