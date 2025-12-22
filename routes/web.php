@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -13,19 +14,23 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
-"Route::middleware(['auth'])->group(function () {
-    Route::get('/retos/crear', [RetoController::class, 'create'])->name('retos.create');
-    Route::post('/retos', [RetoController::class, 'store'])->name('retos.store');
-});
-";
+
+
+//Route::middleware(['auth'])->group(function () {
+//    Route::get('/retos/crear', [RetoController::class, 'create'])->name('retos.create');
+//    Route::post('/retos', [RetoController::class, 'store'])->name('retos.store');
+// });
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', DashboardController::class)
+        ->name('dashboard');
+    //Route::get('/dashboard', function () {
+    //    return Inertia::render('Dashboard');
+    // })->name('dashboard');
     require "web/emilio.php";
     require "web/angel.php";
 });

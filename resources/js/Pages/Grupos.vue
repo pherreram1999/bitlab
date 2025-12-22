@@ -1,16 +1,24 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from "vue";
 import { Link, useForm } from "@inertiajs/vue3";
 import SidebarOnlyLayout from "@/Layouts/SidebarOnlyLayout.vue";
 
-const props = defineProps({
-    grupos: { type: Array, default: () => [] }, // [{id,nombre,fecha,...}]
-});
 
-/* Modal */
+interface Grupo {
+    clave: string;
+    nombre: string;
+    portada: string;
+    descripcion: string;
+}
+
+interface Props {
+    grupos: Grupo[]
+}
+
+const props = defineProps<Props>()
+
 const showJoin = ref(false);
 
-/* Form (Inertia) */
 const form = useForm({
     codigo: "",
 });
@@ -48,9 +56,9 @@ function fmtDate(d) {
         title="Grupos"
         :groups="props.grupos"
         :activeGroupId="null"
-        hrefHome="/dashboard"
-    >
-        <div class="mx-auto" :style="{ width: '850px' }">
+        hrefHome="/dashboard">
+
+        <div class="mx-auto">
             <section :style="{ width: '850px' }">
                 <div class="groupsGrid">
                     <Link

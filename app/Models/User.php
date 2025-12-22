@@ -61,19 +61,29 @@ class User extends Authenticatable
     /**
      * Get the attributes that should be cast.
      *
-     * @return array<string, string>
      */
     public function rol(){
         return $this->belongsTo(Rol::class);
     }
 
-    public function gruposImpartidos(){
+    public function grupos_impartidos(){
         return $this->hasMany(Grupo::class,'usuario_id');
     }
-    public function gruposInscritos(){
+    public function grupos_inscritos(){
         return $this->belongsToMany(Grupo::class, 'inscripciones', 'usuario_id', 'grupo_id')
             ->withPivot('puntos_obtenidos','id')
             ->withTimestamps();
+    }
+
+    public function grupos(){
+        // dependiendo el rol retorna los grupos
+        /** @var Rol $rol */
+        $rol = $this->rol;
+
+        if ($rol->clave === 'PROFESOR')
+            return $this->grupos_inscritos();
+        // de lo contrario es un alumno
+        return $this->grupos_impartidos();
     }
     public function realizaciones(){
         return $this->hasMany(RealizacionReto::class);
