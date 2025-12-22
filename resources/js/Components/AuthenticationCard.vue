@@ -6,7 +6,7 @@
             <slot name="logo" />
         </div>
 
-        <div class="w-full md:max-w-lg px-1 lg:px-10 py-12 bg-white overflow-hidden rounded-lg">
+        <div class="w-full md:max-w-fit px-1 lg:px-10 py-12 bg-white overflow-hidden rounded-lg">
             <slot />
         </div>
         </div>

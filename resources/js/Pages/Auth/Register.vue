@@ -11,6 +11,8 @@ import InicioAppLayout from "@/Layouts/InicioAppLayout.vue";
 
 const form = useForm({
     name: '',
+    apellido_paterno: '',
+    apellido_materno: '',
     email: '',
     password: '',
     password_confirmation: '',
@@ -49,12 +51,40 @@ const submit = () => {
                     v-model="form.name"
                     type="text"
                     class="mt-1 block w-full"
-                    :placeholder="'Usuario Ejemplo'"
+                    :placeholder="'Jose Pedro'"
                     required
                     autofocus
                     autocomplete="name"
                 />
                 <InputError class="mt-2" :message="form.errors.name" />
+            </div>
+
+            <div class="mt-4">
+                <InputLabel for="apellido_paterno" value="Apellido paterno" />
+                <TextInput
+                    id="apellido_paterno"
+                    v-model="form.apellido_paterno"
+                    type="text"
+                    class="mt-1 block w-full"
+                    :placeholder="'Luis'"
+                    required
+                    autocomplete=""
+                />
+                <InputError class="mt-2" :message="form.errors.apellido_paterno" />
+            </div>
+
+            <div class="mt-4">
+                <InputLabel for="apellido_materno" value="Apellido materno" />
+                <TextInput
+                    id="apellido_materno"
+                    v-model="form.apellido_materno"
+                    type="text"
+                    class="mt-1 block w-full"
+                    :placeholder="'Mendoza'"
+                    required
+                    autocomplete=""
+                />
+                <InputError class="mt-2" :message="form.errors.apellido_materno" />
             </div>
 
             <div class="mt-4">
@@ -98,19 +128,20 @@ const submit = () => {
                 />
                 <InputError class="mt-2" :message="form.errors.password_confirmation" />
             </div>
+
             <div class="flex items-center gap-6 mt-5">
                 <span class="text-gray-700 font-medium">Tipo de usuario:</span>
                 <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="radio" value="profesor" v-model="form.tipousr" class="text-orange-500 focus:ring-orange-500 h-5 w-5">
+                    <input type="radio" value="PROFESOR" v-model="form.tipousr" class="text-orange-500 focus:ring-orange-500 h-5 w-5">
                     <span class="text-gray-700">Profesor</span>
                 </label>
                 <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="radio" value="alumno" v-model="form.tipousr" class="text-orange-500 focus:ring-orange-500 h-5 w-5">
+                    <input type="radio" value="ALUMNO" v-model="form.tipousr" class="text-orange-500 focus:ring-orange-500 h-5 w-5">
                     <span class="text-gray-700">Alumno</span>
                 </label>
 
             </div>
-            <div v-if="form.tipousr === 'profesor'" class="flex flex-row items-center gap-3 mt-5 text-gray-700 font-medium">
+            <div v-if="form.tipousr === 'PROFESOR'" class="flex flex-row items-center gap-3 mt-5 text-gray-700 font-medium">
                 Número de empleado:
                     <TextInput
                         id="matricula"
@@ -122,7 +153,7 @@ const submit = () => {
                     />
                     <InputError class="mt-2" :message="form.errors.matricula" />
             </div>
-            <div v-else-if="form.tipousr === 'alumno'" class="flex flex-row items-center gap-3 mt-5 text-gray-700 font-medium">
+            <div v-else-if="form.tipousr === 'ALUMNO'" class="flex flex-row items-center gap-3 mt-5 text-gray-700 font-medium">
                 Número de matricula:
                 <TextInput
                     id="matricula"
@@ -135,7 +166,7 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.matricula" />
             </div>
             <div v-else>
-
+                <InputError class="mt-2" :message="form.errors.matricula" />
             </div>
             <div v-if="$page.props.jetstream.hasTermsAndPrivacyPolicyFeature" class="mt-4">
                 <InputLabel for="terms">
