@@ -6,6 +6,7 @@ import JoinGroupModal from "@/Components/JoinGroupModal.vue";
 import {useUser} from "@/composable/useUser";
 import {router} from '@inertiajs/vue3'
 import {Grupo} from "@/interfaces";
+import {getGrupoUri} from "@/composable/getGrupoUri";
 
 const user = useUser()
 
@@ -25,6 +26,7 @@ function openForm() {
         return router.visit('/grupos/crear')
     showForm.value = true;
 }
+
 
 function fmtDate(d) {
     if (!d) return "";
@@ -46,7 +48,7 @@ function fmtDate(d) {
                         v-for="g in grupos"
                         :key="g.id"
                         class="groupCard"
-                        :href="`/grupo/${g.id}`"
+                        :href="getGrupoUri(g,user)"
                     >
                         <div class="cardInner">
                             <div class="cardText">

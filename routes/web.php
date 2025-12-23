@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\GrupoController;
+use App\Http\Controllers\GrupoProfesorController;
 use App\Http\Middleware\GrupoMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -24,7 +25,9 @@ Route::middleware([
         ->group(function () {
             Route::get('dashboard', GrupoController::class)
                 ->name('dashboard');
-            Route::get('grupo/{id}',[GrupoController::class,'show']);
+            //
+            Route::get('profesor/{id}/grupo',[GrupoProfesorController::class,'show']);
+            Route::post('profesor/{id}/alumnos',[GrupoProfesorController::class,'getMembers']);
         });
     Route::post('grupos/inscribir',[GrupoController::class,'inscribir']);
 

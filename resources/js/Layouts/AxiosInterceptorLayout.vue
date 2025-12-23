@@ -1,68 +1,22 @@
 <script setup>
-import { ref, provide } from 'vue';
-import axios from 'axios';
+import { watch } from 'vue';
 import DialogModal from '@/Components/DialogModal.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
+import { useAxios } from '@/composable/useAxios';
 
-// Create a dedicated axios instance
-const axiosInstance = axios.create();
+const SUCCESS_TIMEOUT = 700;
+const { modalState, closeModal } = useAxios();
 
-// Reactive state for the transaction lifecycle
-const modalState = ref({
-    show: false,
-    status: 'idle', // 'idle' | 'loading' | 'success' | 'error'
-    message: '',
+watch(() => modalState.value.status, (newStatus) => {
+    if (newStatus === 'success') {
+        setTimeout(() => {
+            // Check if status is still success to avoid closing if it changed in between
+            if (modalState.value.status === 'success') {
+                closeModal();
+            }
+        }, SUCCESS_TIMEOUT);
+    }
 });
-
-// Request Interceptor
-axiosInstance.interceptors.request.use((config) => {
-    modalState.value = {
-        show: true,
-        status: 'loading',
-        message: 'Procesando...',
-    };
-    return config;
-}, (error) => {
-    modalState.value = {
-        show: true,
-        status: 'error',
-        message: 'Algo ha fallado al iniciar la petición.',
-    };
-    return Promise.reject(error);
-});
-
-// Response Interceptor
-axiosInstance.interceptors.response.use((response) => {
-    modalState.value = {
-        show: true,
-        status: 'success',
-        message: 'Transacción correcta',
-    };
-    return response;
-}, (error) => {
-    const errorMessage = error.response?.data?.message || error.message || 'Algo ha fallado';
-    modalState.value = {
-        show: true,
-        status: 'error',
-        message: errorMessage,
-    };
-    return Promise.reject(error);
-});
-
-// Provide the axios instance to children
-provide('axios', axiosInstance);
-
-// Close modal handler
-const closeModal = () => {
-    // Prevent closing while loading
-    if (modalState.value.status === 'loading') return;
-    
-    modalState.value.show = false;
-    setTimeout(() => {
-        modalState.value.status = 'idle';
-        modalState.value.message = '';
-    }, 200); // Wait for transition
-};
 </script>
 
 <template>
@@ -71,9 +25,9 @@ const closeModal = () => {
         <slot />
 
         <!-- Feedback Modal -->
-        <DialogModal 
-            :show="modalState.show" 
-            :closeable="modalState.status !== 'loading'"
+        <DialogModal
+            :show="modalState.show"
+            :closeable="modalState.status === 'error'"
             @close="closeModal"
             max-width="md"
         >
@@ -85,7 +39,7 @@ const closeModal = () => {
 
             <template #content>
                 <div class="flex flex-col items-center justify-center p-4 space-y-4">
-                    
+
                     <!-- Loading State -->
                     <div v-if="modalState.status === 'loading'" class="flex flex-col items-center">
                         <svg class="animate-spin h-10 w-10 text-slate-600 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -111,8 +65,8 @@ const closeModal = () => {
             </template>
 
             <template #footer>
-                <SecondaryButton 
-                    v-if="modalState.status !== 'loading'" 
+                <SecondaryButton
+                    v-if="modalState.status === 'error'"
                     @click="closeModal"
                 >
                     Cerrar

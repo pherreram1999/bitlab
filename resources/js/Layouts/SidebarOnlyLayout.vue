@@ -3,17 +3,17 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import { Link } from "@inertiajs/vue3";
 import { ref } from "vue";
 import { usePage } from "@inertiajs/vue3";
+import {getGrupoUri} from "@/composable/getGrupoUri.ts";
+import {useUser} from "@/composable/useUser.ts";
+
+
+const user = useUser()
 
 const page = usePage()
 
-
 const groups = page.props.grupos
 
-
-
 const isMobileMenuOpen = ref(false);
-
-
 
 const props = defineProps({
     title: { type: String, default: "Dashboard" },
@@ -76,7 +76,7 @@ function groupHref(g) {
                     <Link
                         v-for="g in groups"
                         :key="g.id"
-                        :href="`/grupo/${g.id}`"
+                        :href="getGrupoUri(g,user)"
                         class="sidebarBtn"
                         :class="{ 'sidebarBtn--selected': String(props.activeGroupId) === String(g.id) }" @click="isMobileMenuOpen = false"
                         :style="{ width: '280px', height: '61px' }"

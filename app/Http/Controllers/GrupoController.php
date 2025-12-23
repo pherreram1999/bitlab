@@ -59,11 +59,4 @@ class GrupoController extends Controller
         return redirect()->route('dashboard');
     }
 
-
-    function show($id){
-        // mostramos los datos
-        $grupo = Grupo::query()->findOrFail($id);
-
-        return Inertia::render('Grupo', ['grupo' => $grupo]);
-    }
 }

@@ -18,7 +18,7 @@ const props = defineProps({
 const emit = defineEmits(["close"]);
 
 
-const client = useAxios()
+const { axios: client } = useAxios()
 
 const form = useForm({
     codigo: "",
