@@ -9,22 +9,22 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
 
-    //Route::get('/alumnos', [AlumnoController::class, 'index'])->name('alumno.index');
+    Route::get('/alumnos', [AlumnoController::class, 'index'])->name('alumno.index');
 
     //Entrar a un grupo
-    //Route::post('/alumnos/grupos/unirse', [AlumnoGrupoController::class, 'join'])
-     //   ->name('alumno.grupos.join');
+    Route::post('/alumnos/grupos/unirse', [AlumnoGrupoController::class, 'join'])
+        ->name('alumno.grupos.join');
 
     // HUB de grupos (cards)
-    //Route::get('/alumnos/grupos', [AlumnoGrupoController::class, 'index'])
-    //    ->name('alumno.grupos.index');
+    Route::get('/alumnos/grupos', [AlumnoGrupoController::class, 'index'])
+        ->name('alumno.grupos.index');
 
     // Detalle por grupo (puedes dejarlo en AlumnoController)
-    //Route::get('/alumnos/grupos/{grupo}/retos', [AlumnoController::class, 'retos'])
-    //    ->name('alumno.grupo.retos');
+    Route::get('/alumnos/grupos/{grupo}/retos', [AlumnoController::class, 'retos'])
+        ->name('alumno.grupo.retos');
 
-    //Route::get('/alumnos/grupos/{grupo}/miembros', [AlumnoController::class, 'miembros'])
-    //    ->name('alumno.grupo.miembros');
+    Route::get('/alumnos/grupos/{grupo}/miembros', [AlumnoController::class, 'miembros'])
+        ->name('alumno.grupo.miembros');
 
 });
 

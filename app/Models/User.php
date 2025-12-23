@@ -89,6 +89,10 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    public function gruposInscritos()
+    {
+        return $this->grupos_inscritos();
+    }
 
     public function realizaciones(){
         return $this->hasMany(RealizacionReto::class);

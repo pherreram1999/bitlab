@@ -23,7 +23,7 @@ class AlumnoGrupoController extends Controller
                 'fecha' => optional($g->created_at)->format('d/m/Y'),
             ]);
 
-        return Inertia::render('Grupos/AlumnoGrupos', [
+        return Inertia::render('GruposDashboard', [
             'grupos' => $grupos,
         ]);
     }
