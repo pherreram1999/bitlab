@@ -86,7 +86,17 @@ const select = async (t: Tabs) => {
                     {{ m.nombre }}
                 </div>
             </section>
+            <section v-else>
+                <button class="fabBtn" type="button"
+                        aria-label="Unirse a un grupo"
+                        @click.prevent>
+                    <span class="plusV"></span>
+                    <span class="plusH"></span>
+                </button>
+            </section>
         </Transition>
+
+
 
     </SidebarOnlyLayout>
 </template>

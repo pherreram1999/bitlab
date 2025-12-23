@@ -149,58 +149,6 @@ function fmtDate(d) {
 .emptyTitle{ font-size:22px; font-weight:800; color:#2B2E36; }
 .emptyText{ margin-top:8px; color:#4B556B; }
 
-/* FAB más pequeño: 84x84 */
-.fabBtn{
-    position: fixed;
-    right: 20px;
-    bottom: 20px;
-    width: 64px;
-    height: 64px;
-    border-radius: 999px;
-    background: #3B3F48;
-    border: none;
-    cursor: pointer;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index: 50;
-}
-
-@media (min-width: 768px) {
-    .fabBtn {
-        right: 70px;
-        bottom: 70px;
-        width: 84px;
-        height: 84px;
-    }
-}
-
-/* Cruz más pequeña */
-.plusV{
-    position:absolute;
-    width: 6px;
-    height: 32px;
-    background:#E17101;
-    border-radius: 10px;
-}
-.plusH{
-    position:absolute;
-    width: 32px;
-    height: 6px;
-    background:#E17101;
-    border-radius: 10px;
-}
-
-@media (min-width: 768px) {
-    .plusV {
-        width: 8px;
-        height: 44px;
-    }
-    .plusH {
-        width: 44px;
-        height: 8px;
-    }
-}
 
 /* Responsive */
 @media (max-width: 1100px){
