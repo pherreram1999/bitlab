@@ -87,12 +87,13 @@ const select = async (t: Tabs) => {
                 </div>
             </section>
             <section v-else>
-                <button class="fabBtn" type="button"
-                        aria-label="Unirse a un grupo"
-                        @click.prevent>
+                <!-- Enlace para crear un reto !-->
+                <Link class="fabBtn"
+                      :href="`/retos/${grupo.id}/crear`"
+                      aria-label="Unirse a un grupo">
                     <span class="plusV"></span>
                     <span class="plusH"></span>
-                </button>
+                </Link>
             </section>
         </Transition>
 

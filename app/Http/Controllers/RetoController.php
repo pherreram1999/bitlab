@@ -1,15 +1,18 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Grupo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 
 class RetoController extends Controller
 {
-    public function create()
+    public function create($id)
     {
-        return Inertia::render('Retos/Crear');
+        /** @var Grupo $grupo */
+        $grupo = Grupo::findOrFail($id);
+        return Inertia::render('RetoCrear',['grupo'=>$grupo]);
     }
     public function store(Request $request)
     {

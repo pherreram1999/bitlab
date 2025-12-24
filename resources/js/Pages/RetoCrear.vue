@@ -1,8 +1,17 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useForm } from '@inertiajs/vue3';
-import bitlabLogo from '../../../img/bitlab_icon.webp';
-import bitlabIsologo from '../../../img/bitLab_isologo.webp';
+import bitlabLogo from '../../img/bitlab_icon.webp';
+import bitlabIsologo from '../../img/bitLab_isologo.webp';
+
+import {Grupo} from "@/interfaces";
+
+interface Props {
+    grupo: Grupo
+}
+
+const props = defineProps<Props>()
+
 
 const form = useForm({
     titulo: '',
