@@ -1,8 +1,15 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useForm, Link } from '@inertiajs/vue3';
-import bitlabLogo from '../../../img/bitlab_icon.webp';
-import bitlabIsologo from '../../../img/bitLab_isologo.webp';
+import bitlabLogo from '../../img/bitlab_icon.webp';
+import bitlabIsologo from '../../img/bitLab_isologo.webp';
+import InputError from '@/Components/InputError.vue';
+import {Grupo} from "@/interfaces";
+interface Props {
+    grupo: Grupo
+}
+
+const props = defineProps<Props>()
 
 const form = useForm({
     titulo: '',
@@ -21,7 +28,8 @@ const form = useForm({
                 {inciso: 'B', texto: '', correcta: false}
             ]
         }
-    ]
+    ],
+    grupo_id: props.grupo.id
 });
 
 const indiceActual = ref(0);
@@ -111,18 +119,22 @@ function guardarReto() {
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-gray-500 mb-1">Título del Reto</label>
                                 <input v-model="form.titulo" type="text" placeholder="Ej. Examen Parcial" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 outline-none transition">
+                                <InputError :message="form.errors.titulo" class="mt-2" />
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-gray-500 mb-1">Descripción General</label>
                                 <textarea v-model="form.descripcion" rows="2" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 outline-none transition resize-none"></textarea>
+                                <InputError :message="form.errors.descripcion" class="mt-2" />
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 mb-1">Puntaje Total</label>
                                 <input v-model="form.puntaje" type="number" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 outline-none transition">
+                                <InputError :message="form.errors.puntaje" class="mt-2" />
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 mb-1">Intentos Máximos</label>
                                 <input v-model="form.max_intentos" type="number" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 outline-none transition">
+                                <InputError :message="form.errors.max_intentos" class="mt-2" />
                             </div>
 
                             <div>
@@ -132,11 +144,13 @@ function guardarReto() {
                                     type="datetime-local"
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 outline-none transition text-gray-600"
                                 >
+                                <InputError :message="form.errors.fecha_limite" class="mt-2" />
                             </div>
 
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 mb-1">Ayuda</label>
                                 <input v-model="form.ayuda" type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 outline-none transition">
+                                <InputError :message="form.errors.ayuda" class="mt-2" />
                             </div>
                         </div>
                     </div>
@@ -144,7 +158,9 @@ function guardarReto() {
                     <div class="flex-1">
                         <div class="space-y-4">
                             <input v-model="preguntaActual.texto" type="text" :placeholder="`Pregunta ${indiceActual + 1}`" class="w-full text-lg border-b-2 border-gray-300 px-2 py-2 focus:border-orange-500 outline-none">
+                            <InputError :message="form.errors[`opciones.${indiceActual}.texto`]" class="mt-2" />
                             <textarea v-model="preguntaActual.info_adicional" rows="3" class="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Info adicional"></textarea>
+                            <InputError :message="form.errors[`opciones.${indiceActual}.info_adicional`]" class="mt-2" />
 
                             <div class="flex items-center gap-6 pt-2">
                                 <span class="text-gray-700 font-medium text-sm">Respuesta:</span>
@@ -157,29 +173,34 @@ function guardarReto() {
                                     <span>Opción Múltiple</span>
                                 </label>
                             </div>
+                             <InputError :message="form.errors[`opciones.${indiceActual}.tipo`]" class="mt-2" />
 
                             <div v-if="preguntaActual.tipo === 'multiple'" class="bg-orange-50 p-4 rounded-xl border border-orange-100 mt-2">
-                                <div v-for="(alt, index) in preguntaActual.alternativas" :key="index" class="flex items-center gap-2 mb-2">
-                                    <span class="font-bold text-orange-600 w-6 text-center">{{ alt.inciso }}</span>
+                                <div v-for="(alt, index) in preguntaActual.alternativas" :key="index" class="mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-orange-600 w-6 text-center">{{ alt.inciso }}</span>
 
-                                    <input v-model="alt.texto" type="text" class="flex-1 border border-gray-300 rounded px-3 py-1 text-sm focus:border-orange-500 outline-none" placeholder="Escribe la opción...">
+                                        <input v-model="alt.texto" type="text" class="flex-1 border border-gray-300 rounded px-3 py-1 text-sm focus:border-orange-500 outline-none" placeholder="Escribe la opción...">
 
-                                    <label class="flex items-center cursor-pointer text-xs text-gray-500 gap-1 select-none">
-                                        <input
-                                            type="radio"
-                                            :name="`correcta_pregunta_${indiceActual}`"
-                                            :checked="alt.correcta"
-                                            @change="marcarCorrecta(index)"
-                                            class="text-orange-600 focus:ring-orange-500 cursor-pointer"
-                                        >
-                                        <span :class="alt.correcta ? 'font-bold text-orange-700' : ''">Correcta</span>
-                                    </label>
+                                        <label class="flex items-center cursor-pointer text-xs text-gray-500 gap-1 select-none">
+                                            <input
+                                                type="radio"
+                                                :name="`correcta_pregunta_${indiceActual}`"
+                                                :checked="alt.correcta"
+                                                @change="marcarCorrecta(index)"
+                                                class="text-orange-600 focus:ring-orange-500 cursor-pointer"
+                                            >
+                                            <span :class="alt.correcta ? 'font-bold text-orange-700' : ''">Correcta</span>
+                                        </label>
 
-                                    <button @click="eliminarInciso(index)" v-if="preguntaActual.alternativas.length > 2" class="text-red-400 hover:text-red-600 font-bold px-2">✕</button>
+                                        <button @click="eliminarInciso(index)" v-if="preguntaActual.alternativas.length > 2" class="text-red-400 hover:text-red-600 font-bold px-2">✕</button>
+                                    </div>
+                                    <InputError :message="form.errors[`opciones.${indiceActual}.alternativas.${index}.texto`]" class="mt-1 ml-8" />
                                 </div>
                                 <button @click="agregarInciso" v-if="preguntaActual.alternativas.length < 6" class="text-xs font-bold text-orange-600 hover:text-orange-800 mt-1 flex items-center gap-1 pl-8">
                                     + Agregar opción
                                 </button>
+                                <InputError :message="form.errors[`opciones.${indiceActual}.alternativas`]" class="mt-2" />
                             </div>
                         </div>
                     </div>

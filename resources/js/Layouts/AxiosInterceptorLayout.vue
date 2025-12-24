@@ -4,17 +4,11 @@ import DialogModal from '@/Components/DialogModal.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import { useAxios } from '@/composable/useAxios';
 
-const SUCCESS_TIMEOUT = 700;
 const { modalState, closeModal } = useAxios();
 
 watch(() => modalState.value.status, (newStatus) => {
     if (newStatus === 'success') {
-        setTimeout(() => {
-            // Check if status is still success to avoid closing if it changed in between
-            if (modalState.value.status === 'success') {
-                closeModal();
-            }
-        }, SUCCESS_TIMEOUT);
+        closeModal();
     }
 });
 </script>
@@ -33,7 +27,6 @@ watch(() => modalState.value.status, (newStatus) => {
         >
             <template #title>
                 <span v-if="modalState.status === 'loading'">Cargando</span>
-                <span v-else-if="modalState.status === 'success'">¡Éxito!</span>
                 <span v-else-if="modalState.status === 'error'">Error</span>
             </template>
 
@@ -46,13 +39,7 @@ watch(() => modalState.value.status, (newStatus) => {
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        <p class="text-slate-600 font-medium">{{ modalState.message }}</p>
-                    </div>
-
-                    <!-- Success State -->
-                    <div v-else-if="modalState.status === 'success'" class="flex flex-col items-center text-center">
-                        <div class="text-5xl mb-2">🎉</div>
-                        <p class="text-lg text-slate-800 font-semibold">{{ modalState.message }}</p>
+                        <p class="text-slate-600 font-medium">Cargando...</p>
                     </div>
 
                     <!-- Error State -->

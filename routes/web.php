@@ -26,7 +26,8 @@ Route::middleware([
         ->group(function () {
             Route::get('dashboard', GrupoController::class)
                 ->name('dashboard');
-            Route::get('grupo/{id}',[GrupoController::class,'show']);
+            Route::get('grupo/{id}',[GrupoController::class,'show'])
+                ->name('grupo.show');
            // Route::post('profesor/{id}/alumnos',[GrupoManageController::class,'getMembers']);
         });
     Route::get('/grupos/crear', [GrupoController::class, 'create'])

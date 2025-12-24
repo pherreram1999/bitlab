@@ -29,14 +29,12 @@ class RetoController extends Controller
             'opciones.*.alternativas' => 'nullable|array',
             'fecha_limite' => 'required|date',
             'max_intentos' => 'required|integer',
-            'ayuda' => 'nullable|string'
+            'ayuda' => 'nullable|string',
+            'grupo_id' => 'required|exists:grupos,id',
         ]);
-        $grupo = $request->user()->gruposImpartidos()->first();
 
-        if (!$grupo) {
-            return back()->withErrors(['error' => 'No tienes grupos creados.']);
-        }
-
+        /** @var Grupo $grupo */
+        $grupo = Grupo::findOrFail($validated['grupo_id']);
         // Creamos el reto
         $grupo->retos()->create([
             'titulo' => $validated['titulo'],
@@ -47,6 +45,8 @@ class RetoController extends Controller
             'ayuda' => $validated['ayuda'],
             'fecha_limite' => Carbon::parse($validated['fecha_limite']),
         ]);
-        return Redirect::route('profesor.retos')->with('success', 'Reto creado correctamente');
+
+        return Redirect::route('grupo.show',[$grupo->id])
+            ->with('success', 'Reto creado correctamente');
     }
 }
