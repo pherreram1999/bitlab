@@ -15,7 +15,9 @@ class Grupo extends Model
         'descripcion',
         'portada',
         'concluido',
-        'usuario_id'
+        'usuario_id',
+        'portada',
+        'color'
     ];
     protected $casts = [
         'concluido' => 'boolean',

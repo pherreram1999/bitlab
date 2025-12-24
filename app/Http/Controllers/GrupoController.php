@@ -6,6 +6,7 @@ use App\Models\Grupo;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class GrupoController extends Controller
@@ -43,18 +44,33 @@ class GrupoController extends Controller
         $validated = $request->validate([
             'nombre' => 'required|string|max:100',
             'descripcion' => 'nullable|string|max:500',
+            'portada' => 'nullable|image|mimes:jpeg,png,jpg,svg,webp|max:2048',
         ]);
 
         do {
             $claveGenerada = mt_rand(10000, 99999);
         } while (Grupo::where('clave', $claveGenerada)->exists());
 
+        $rutaPortada = null;
+        $colorAleatorio = null;
+
+        if ($request->hasFile('portada')) {
+            $rutaPortada = Storage::disk('public')->putFile('grupos', $request->file('portada'));
+        } else {
+            $colores = [
+                '#F97316', '#3B82F6', '#10B981', '#8B5CF6', '#EF4444', '#EC4899'
+            ];
+            $colorAleatorio = $colores[array_rand($colores)];
+        }
+
         $request->user()->grupos()->create([
             'nombre' => $validated['nombre'],
             'descripcion' => $validated['descripcion'],
             'clave' => $claveGenerada,
             'concluido' => false,
-            'usuario_id' => Auth::id() // para el usuario creador del grupo
+            'usuario_id' => Auth::id(),
+            'portada' => $rutaPortada,
+            'color' => $colorAleatorio
         ]);
         return redirect()->route('dashboard');
     }
@@ -88,5 +104,24 @@ class GrupoController extends Controller
 
         return response()->json($alumnos);
     }
+
+    //para eliminar la imagen si se borra el grupo
+    public function destroy(Grupo $grupo)
+    {
+        if ($grupo->usuario_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($grupo->portada) {
+            if (Storage::disk('public')->exists($grupo->portada)) {
+                Storage::disk('public')->delete($grupo->portada);
+            }
+        }
+
+        $grupo->delete();
+
+        return redirect()->route('dashboard');
+    }
+
 
 }
