@@ -36,6 +36,7 @@ Route::middleware([
         ->name('grupos.store');
     Route::post('grupos/inscribir',[GrupoController::class,'inscribir']);
     Route::post('/grupo/{id}/miembros',[GrupoController::class,'getMembers']);
+    Route::post('/grupo/{id}/retos',[GrupoController::class,'getRetos']);
     // retos
     //Route::inertia("/retos/crear", "Retos/Crear");
     Route::get('/retos/{id}/crear', [RetoController::class, 'create'])

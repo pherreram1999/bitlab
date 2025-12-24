@@ -105,6 +105,18 @@ class GrupoController extends Controller
         return response()->json($alumnos);
     }
 
+    public function getRetos($id){
+        $grupo = Grupo::query()
+            ->findOrFail($id);
+
+        $retos = $grupo
+            ->retos()
+            ->select('id','titulo')
+            ->get();
+
+        return response()->json($retos);
+    }
+
     //para eliminar la imagen si se borra el grupo
     public function destroy(Grupo $grupo)
     {

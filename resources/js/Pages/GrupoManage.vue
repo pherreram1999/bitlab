@@ -2,10 +2,9 @@
 import SidebarOnlyLayout from "@/Layouts/SidebarOnlyLayout.vue";
 import {Grupo} from "@/interfaces.ts";
 import {Link} from "@inertiajs/vue3";
-import {ref, shallowRef} from "vue";
+import {onBeforeMount, ref, shallowRef} from "vue";
 import {useAxios} from "@/composable/useAxios";
-import AppLayout from "@/Layouts/AppLayout.vue";
-
+import AlumnosRetos from "@/Pages/Retos/AlumnosRetos.vue";
 
 const { axios: client } = useAxios()
 interface Props {
@@ -20,6 +19,7 @@ enum Tabs {
 }
 
 const miembros = shallowRef([])
+const retos = shallowRef([])
 
 const tab = ref<Tabs>(Tabs.Retos)
 
@@ -28,18 +28,30 @@ const getMembers = async () => {
     miembros.value = data
 }
 
+const getRetos = async () => {
+    const {data} = await client.post(`/grupo/${props.grupo.id}/retos`)
+    retos.value = data
+}
+
+
 const select = async (t: Tabs) => {
-    console.log(t)
     switch (t) {
         case Tabs.Miembros:
             await getMembers()
             tab.value = Tabs.Miembros
             break
         case Tabs.Retos:
+            await getRetos()
             tab.value = Tabs.Retos
             break
     }
 }
+
+// por defecto debemos cargar los retos
+
+onBeforeMount(() => {
+    getRetos()
+})
 
 </script>
 
@@ -86,7 +98,10 @@ const select = async (t: Tabs) => {
                     {{ m.nombre }}
                 </div>
             </section>
-            <section v-else>
+            <section class="mt-4" v-else>
+                <div class="px-4 py-2 bg-white rounded-lg" v-for="r of retos">
+                    {{ r.titulo }}
+                </div>
                 <!-- Enlace para crear un reto !-->
                 <Link class="fabBtn"
                       :href="`/retos/${grupo.id}/crear`"
