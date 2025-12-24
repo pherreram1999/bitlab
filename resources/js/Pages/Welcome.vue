@@ -3,11 +3,11 @@ import {Head, Link} from "@inertiajs/vue3";
 import ApplicationMark from "@/Components/ApplicationMark.vue";
 import InicioAppLayout from "@/Layouts/InicioAppLayout.vue";
 import AuthenticationCardLogo from "@/Components/AuthenticationCardLogo.vue";
+import { Dropdown, Tooltip, Menu, vTooltip } from 'floating-vue'
 </script>
 
 <template>
     <Head title="welcome"/>
-
     <InicioAppLayout>
         <template #inic>
             <a href="/login"
