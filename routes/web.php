@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\GrupoController;
-use App\Http\Controllers\GrupoProfesorController;
+use App\Http\Controllers\GrupoManageController;
 use App\Http\Middleware\GrupoMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -21,16 +21,24 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
+    // grupos
     Route::middleware(GrupoMiddleware::class)
         ->group(function () {
             Route::get('dashboard', GrupoController::class)
                 ->name('dashboard');
-            //
-            Route::get('profesor/{id}/grupo',[GrupoProfesorController::class,'show']);
-            Route::post('profesor/{id}/alumnos',[GrupoProfesorController::class,'getMembers']);
+            Route::get('grupo/{id}',[GrupoController::class,'show']);
+           // Route::post('profesor/{id}/alumnos',[GrupoManageController::class,'getMembers']);
         });
+    Route::get('/grupos/crear', [GrupoController::class, 'create'])
+        ->name('grupos.create');
+    Route::post('/grupos', [GrupoController::class, 'store'])
+        ->name('grupos.store');
     Route::post('grupos/inscribir',[GrupoController::class,'inscribir']);
-
+    Route::post('/grupo/{id}/miembros',[GrupoController::class,'getMembers']);
+    // retos
+    //Route::inertia("/retos/crear", "Retos/Crear");
+    Route::get('/retos/{id}/crear', [RetoController::class, 'create'])
+        ->name('retos.create');
 
     require "web/emilio.php";
     require "web/angel.php";

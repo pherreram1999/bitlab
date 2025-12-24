@@ -1,5 +1,5 @@
 import {Grupo} from "@/interfaces";
 
 export const getGrupoUri = (g: Grupo,user) => (
-    user.rol.clave === 'PROFESOR' ? `/profesor/${g.id}/grupo` :`/alumnos/grupos/${g.id}/retos`
+    user.rol.clave === 'PROFESOR' ? `/grupo/${g.id}` :``
 );

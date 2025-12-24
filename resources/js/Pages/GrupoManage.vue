@@ -24,7 +24,7 @@ const miembros = shallowRef([])
 const tab = ref<Tabs>(Tabs.Retos)
 
 const getMembers = async () => {
-    const {data} = await client.post(`/profesor/${props.grupo.id}/alumnos`)
+    const {data} = await client.post(`/grupo/${props.grupo.id}/miembros`)
     miembros.value = data
 }
 

@@ -48,7 +48,7 @@ function fmtDate(d) {
                         v-for="g in grupos"
                         :key="g.id"
                         class="groupCard"
-                        :href="getGrupoUri(g,user)"
+                        :href="`/grupo/${g.id}`"
                     >
                         <div class="cardInner">
                             <div class="cardText">

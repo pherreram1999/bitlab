@@ -70,7 +70,7 @@ const groups = computed(() => props.groups ?? page.props.grupos ?? []);
                     <Link
                         v-for="g in groups"
                         :key="g.id"
-                        :href="getGrupoUri(g,user)"
+                        :href="`/grupo/${g.id}`"
                         class="sidebarBtn"
                         :class="{ 'sidebarBtn--selected': String(props.activeGroupId) === String(g.id) }"
                         @click="isMobileMenuOpen = false"
