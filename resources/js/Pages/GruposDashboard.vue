@@ -43,7 +43,7 @@ function fmtDate(d) {
 
         <div class="mx-auto px-4 md:px-0">
             <section class="w-full">
-                <div class="grid grid-cols-4 gap-4">
+                <div class="groupsGrid">
                     <Link
                         v-for="g in grupos"
                         :key="g.id"
