@@ -39,6 +39,7 @@ Route::middleware([
     //Route::inertia("/retos/crear", "Retos/Crear");
     Route::get('/retos/{id}/crear', [RetoController::class, 'create'])
         ->name('retos.create');
+    Route::post('/retos', [RetoController::class, 'store'])->name('retos.store');
 
     require "web/emilio.php";
     require "web/angel.php";

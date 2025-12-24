@@ -94,6 +94,11 @@ class User extends Authenticatable
         return $this->grupos_inscritos();
     }
 
+    public function gruposImpartidos()
+    {
+        return $this->hasMany(Grupo::class, 'usuario_id');
+    }
+
     public function realizaciones(){
         return $this->hasMany(RealizacionReto::class);
     }
