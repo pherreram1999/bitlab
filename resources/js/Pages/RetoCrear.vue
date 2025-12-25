@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useForm, Link } from '@inertiajs/vue3';
 import bitlabLogo from '../../img/bitlab_icon.webp';
 import bitlabIsologo from '../../img/bitLab_isologo.webp';
@@ -34,6 +34,27 @@ const form = useForm({
         }
     ],
     grupo_id: props.grupo.id
+});
+
+const fechaPart = ref('');
+const horaPart = ref({
+    hours: new Date().getHours(),
+    minutes: new Date().getMinutes()
+});
+
+watch([fechaPart, horaPart], ([newFecha, newHora]) => {
+    if (newFecha && newHora) {
+        // newFecha is usually a Date object or string depending on config
+        const d = new Date(newFecha);
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        
+        const h = String(newHora.hours).padStart(2, '0');
+        const min = String(newHora.minutes).padStart(2, '0');
+        
+        form.fecha_limite = `${yyyy}-${mm}-${dd} ${h}:${min}:00`;
+    }
 });
 
 const indiceActual = ref(0);
@@ -141,20 +162,29 @@ function guardarReto() {
                                 <InputError :message="form.errors.max_intentos" class="mt-2" />
                             </div>
 
-                            <div>
+                            <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-gray-500 mb-1">Fecha y Hora Límite</label>
-                                <VueDatePicker
-                                    v-model="form.fecha_limite"
-                                    :locale="es"
-                                    text-input
-                                    auto-apply
-                                    cancelText="Cancelar"
-                                    selectText="Seleccionar"
-                                    :teleport="true"
-                                    format="yyyy-MM-dd HH:mm"
-                                    model-type="yyyy-MM-dd HH:mm:ss"
-                                    input-class-name="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 outline-none transition text-gray-600 shadow-none"
-                                />
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <VueDatePicker
+                                        v-model="fechaPart"
+                                        :locale="es"
+                                        :enable-time-picker="false"
+                                        placeholder="Seleccionar Fecha"
+                                        auto-apply
+                                        :teleport="true"
+                                        format="yyyy-MM-dd"
+                                        input-class-name="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 outline-none transition text-gray-600 shadow-none"
+                                    />
+                                    <VueDatePicker
+                                        v-model="horaPart"
+                                        time-picker
+                                        :locale="es"
+                                        placeholder="Seleccionar Hora"
+                                        auto-apply
+                                        :teleport="true"
+                                        input-class-name="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 outline-none transition text-gray-600 shadow-none"
+                                    />
+                                </div>
                                 <InputError :message="form.errors.fecha_limite" class="mt-2" />
                             </div>
 
