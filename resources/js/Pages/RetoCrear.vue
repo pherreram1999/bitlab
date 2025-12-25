@@ -146,6 +146,7 @@ function guardarReto() {
                                 <VueDatePicker
                                     v-model="form.fecha_limite"
                                     :locale="es"
+                                    :flow="['calendar', 'time']"
                                     cancelText="Cancelar"
                                     selectText="Seleccionar"
                                     :teleport="true"
