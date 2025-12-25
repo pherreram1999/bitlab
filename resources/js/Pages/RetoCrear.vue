@@ -26,7 +26,7 @@ const form = useForm({
         {
             texto: '',
             info_adicional: '',
-            tipo: 'libre',
+            tipo: 'multiple',
             alternativas: [
                 {inciso: 'A', texto: '', correcta: false},
                 {inciso: 'B', texto: '', correcta: false}
@@ -78,7 +78,7 @@ function agregarPregunta() {
     form.opciones.push({
         texto: '',
         info_adicional: '',
-        tipo: 'libre',
+        tipo: 'multiple',
         alternativas: [
             {inciso: 'A', texto: '', correcta: false},
             {inciso: 'B', texto: '', correcta: false}
@@ -188,7 +188,7 @@ function guardarReto() {
                                 <InputError :message="form.errors.fecha_limite" class="mt-2" />
                             </div>
 
-                            <div>
+                            <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-gray-500 mb-1">Ayuda</label>
                                 <input v-model="form.ayuda" type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 outline-none transition">
                                 <InputError :message="form.errors.ayuda" class="mt-2" />
@@ -203,20 +203,7 @@ function guardarReto() {
                             <textarea v-model="preguntaActual.info_adicional" rows="3" class="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Info adicional"></textarea>
                             <InputError :message="form.errors[`opciones.${indiceActual}.info_adicional`]" class="mt-2" />
 
-                            <div class="flex items-center gap-6 pt-2">
-                                <span class="text-gray-700 font-medium text-sm">Respuesta:</span>
-                                <label class="flex items-center gap-2 cursor-pointer select-none text-sm">
-                                    <input type="radio" value="libre" v-model="preguntaActual.tipo" class="text-orange-500 focus:ring-orange-500 h-4 w-4">
-                                    <span>Texto Libre</span>
-                                </label>
-                                <label class="flex items-center gap-2 cursor-pointer select-none text-sm">
-                                    <input type="radio" value="multiple" v-model="preguntaActual.tipo" class="text-orange-500 focus:ring-orange-500 h-4 w-4">
-                                    <span>Opción Múltiple</span>
-                                </label>
-                            </div>
-                             <InputError :message="form.errors[`opciones.${indiceActual}.tipo`]" class="mt-2" />
-
-                            <div v-if="preguntaActual.tipo === 'multiple'" class="bg-orange-50 p-4 rounded-xl border border-orange-100 mt-2">
+                            <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 mt-2">
                                 <div v-for="(alt, index) in preguntaActual.alternativas" :key="index" class="mb-2">
                                     <div class="flex items-center gap-2">
                                         <span class="font-bold text-orange-600 w-6 text-center">{{ alt.inciso }}</span>
