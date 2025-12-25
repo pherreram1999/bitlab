@@ -7,6 +7,7 @@ import InputError from '@/Components/InputError.vue';
 import {Grupo} from "@/interfaces";
 import { VueDatePicker } from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
+import { es } from 'date-fns/locale';
 
 interface Props {
     grupo: Grupo
@@ -144,7 +145,7 @@ function guardarReto() {
                                 <label class="block text-xs font-bold text-gray-500 mb-1">Fecha y Hora Límite</label>
                                 <VueDatePicker
                                     v-model="form.fecha_limite"
-                                    locale="es"
+                                    :locale="es"
                                     cancelText="Cancelar"
                                     selectText="Seleccionar"
                                     :teleport="true"
