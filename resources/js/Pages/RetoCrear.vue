@@ -5,6 +5,9 @@ import bitlabLogo from '../../img/bitlab_icon.webp';
 import bitlabIsologo from '../../img/bitLab_isologo.webp';
 import InputError from '@/Components/InputError.vue';
 import {Grupo} from "@/interfaces";
+import { VueDatePicker } from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
+
 interface Props {
     grupo: Grupo
 }
@@ -139,11 +142,16 @@ function guardarReto() {
 
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 mb-1">Fecha y Hora Límite</label>
-                                <input
+                                <VueDatePicker
                                     v-model="form.fecha_limite"
-                                    type="datetime-local"
-                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 outline-none transition text-gray-600"
-                                >
+                                    locale="es"
+                                    cancelText="Cancelar"
+                                    selectText="Seleccionar"
+                                    :teleport="true"
+                                    format="yyyy-MM-dd HH:mm"
+                                    model-type="yyyy-MM-dd HH:mm:ss"
+                                    input-class-name="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 outline-none transition text-gray-600 shadow-none"
+                                />
                                 <InputError :message="form.errors.fecha_limite" class="mt-2" />
                             </div>
 
@@ -214,7 +222,7 @@ function guardarReto() {
 
                     <div class="flex justify-end gap-4 mt-8">
                         <Link
-                            :href="route('profesor.retos')"
+                            :href="route('grupo.show',props.grupo.id)"
                             class="px-6 py-2 rounded-lg border border-gray-300 text-gray-500 hover:bg-gray-50 transition font-medium text-sm flex items-center justify-center"
                         >
                             Cancelar
