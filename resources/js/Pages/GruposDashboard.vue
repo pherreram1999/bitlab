@@ -6,7 +6,6 @@ import JoinGroupModal from "@/Components/JoinGroupModal.vue";
 import {useUser} from "@/composable/useUser";
 import {router} from '@inertiajs/vue3'
 import {Grupo} from "@/interfaces";
-import {getGrupoUri} from "@/composable/getGrupoUri";
 
 const user = useUser()
 
@@ -24,6 +23,7 @@ function openForm() {
     // en caso de que sea profesor, lo mandamos a la vista de crear
     if (user.rol.clave === 'PROFESOR')
         return router.visit('/grupos/crear')
+
     showForm.value = true;
 }
 
@@ -93,7 +93,9 @@ function fmtDate(d) {
                 <span class="plusH"></span>
             </button>
 
-            <JoinGroupModal v-if="user.rol.clave === 'ALUMNO'" :show="showForm" @close="showForm = false" />
+            <JoinGroupModal v-if="user.rol.clave === 'ALUMNO'"
+                            :show="showForm"
+                            @close="showForm = false" />
         </div>
     </SidebarOnlyLayout>
 </template>
