@@ -4,9 +4,13 @@ import {Grupo} from "@/interfaces.ts";
 import {Link} from "@inertiajs/vue3";
 import {onBeforeMount, ref, shallowRef} from "vue";
 import {useAxios} from "@/composable/useAxios";
-import AlumnosRetos from "@/Pages/Retos/AlumnosRetos.vue";
+import {useUser} from "@/composable/useUser";
+import {router} from "@inertiajs/vue3";
 
 const { axios: client } = useAxios()
+
+const user = useUser()
+
 interface Props {
     grupo: Grupo
 }
@@ -52,6 +56,14 @@ const select = async (t: Tabs) => {
 onBeforeMount(() => {
     getRetos()
 })
+
+const abrirReto = (r: any) => {
+    // depediento el ROL
+    if (user.rol.clave === 'PROFESOR') // es una vista pendiente
+        router.visit('/construction')
+    // retornamos al vista para resolver el reto
+    router.visit(`/reto/${r.id}`)
+}
 
 </script>
 
@@ -99,11 +111,18 @@ onBeforeMount(() => {
                 </div>
             </section>
             <section class="mt-4" v-else>
-                <div class="px-4 py-2 bg-white rounded-lg" v-for="r of retos">
-                    {{ r.titulo }}
+                <div @click.prevent="abrirReto(r)"
+                    class="px-4 py-2  bg-white my-2 rounded-lg flex justify-between
+                    hover:shadow-lg cursor-pointer transition-all transform hover:-translate-y-0.5"
+                     v-for="r of retos">
+                    <h2 class="font-semibold px-4 py-2">{{ r.titulo }}</h2>
+                    <time>{{ r.fecha_limite }}</time>
+                    <div>
+
+                    </div>
                 </div>
                 <!-- Enlace para crear un reto !-->
-                <Link class="fabBtn"
+                <Link class="fabBtn" v-if="user.rol.clave === 'PROFESOR'"
                       :href="`/retos/${grupo.id}/crear`"
                       aria-label="Unirse a un grupo">
                     <span class="plusV"></span>

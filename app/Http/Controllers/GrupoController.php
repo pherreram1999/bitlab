@@ -111,7 +111,7 @@ class GrupoController extends Controller
 
         $retos = $grupo
             ->retos()
-            ->select('id','titulo')
+            ->select('id','titulo','fecha_limite')
             ->get();
 
         return response()->json($retos);

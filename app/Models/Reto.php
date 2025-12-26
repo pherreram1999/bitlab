@@ -21,7 +21,7 @@ class Reto extends Model
     ];
     protected $casts = [
         'opciones' => 'array',
-        'fecha_limite' => 'datetime',
+        'fecha_limite' => 'datetime:d/m/Y H:i',
     ];
     public function grupo(): BelongsTo
     {

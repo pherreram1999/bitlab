@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Grupo;
+use App\Models\Reto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
@@ -48,5 +49,13 @@ class RetoController extends Controller
 
         return Redirect::route('grupo.show',[$grupo->id])
             ->with('success', 'Reto creado correctamente');
+    }
+
+
+    public function show($id){
+        $reto = Reto::findOrFail($id);
+
+
+        return Inertia::render('RetoShow',['reto'=>$reto]);
     }
 }
