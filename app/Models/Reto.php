@@ -16,6 +16,7 @@ class Reto extends Model
         'puntaje',
         'opciones',
         'max_intentos',
+        'tiempo_limite',
         'ayuda',
         'fecha_limite',
     ];

@@ -30,6 +30,7 @@ class RetoController extends Controller
             'opciones.*.alternativas' => 'nullable|array',
             'fecha_limite' => 'required|date',
             'max_intentos' => 'required|integer',
+            'tiempo_limite' => 'required|integer|min:3',
             'ayuda' => 'nullable|string',
             'grupo_id' => 'required|exists:grupos,id',
         ]);
@@ -43,6 +44,7 @@ class RetoController extends Controller
             'puntaje' => $validated['puntaje'],
             'opciones' => $validated['opciones'],
             'max_intentos' => $validated['max_intentos'],
+            'tiempo_limite' => $validated['tiempo_limite'],
             'ayuda' => $validated['ayuda'],
             'fecha_limite' => Carbon::parse($validated['fecha_limite']),
         ]);

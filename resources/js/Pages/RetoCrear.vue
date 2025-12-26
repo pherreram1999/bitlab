@@ -20,6 +20,7 @@ const form = useForm({
     descripcion: '',
     puntaje: 10,
     max_intentos: 1,
+    tiempo_limite: 0,
     fecha_limite: '',
     ayuda: '',
     opciones: [
@@ -49,10 +50,10 @@ watch([fechaPart, horaPart], ([newFecha, newHora]) => {
         const yyyy = d.getFullYear();
         const mm = String(d.getMonth() + 1).padStart(2, '0');
         const dd = String(d.getDate()).padStart(2, '0');
-        
+
         const h = String(newHora.hours).padStart(2, '0');
         const min = String(newHora.minutes).padStart(2, '0');
-        
+
         form.fecha_limite = `${yyyy}-${mm}-${dd} ${h}:${min}:00`;
     }
 });
@@ -160,6 +161,11 @@ function guardarReto() {
                                 <label class="block text-xs font-bold text-gray-500 mb-1">Intentos Máximos</label>
                                 <input v-model="form.max_intentos" type="number" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 outline-none transition">
                                 <InputError :message="form.errors.max_intentos" class="mt-2" />
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Tiempo Límite (minutos)</label>
+                                <input v-model="form.tiempo_limite" type="number" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-orange-500 outline-none transition">
+                                <InputError :message="form.errors.tiempo_limite" class="mt-2" />
                             </div>
 
                             <div class="md:col-span-2">

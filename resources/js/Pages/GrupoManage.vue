@@ -57,6 +57,7 @@ onBeforeMount(() => {
     getRetos()
 })
 
+
 const abrirReto = (r: any) => {
     // depediento el ROL
     if (user.rol.clave === 'PROFESOR') // es una vista pendiente
