@@ -38,12 +38,12 @@ Route::middleware([
     Route::post('/grupo/{id}/miembros',[GrupoController::class,'getMembers']);
     Route::post('/grupo/{id}/retos',[GrupoController::class,'getRetos']);
     // retos
-    //Route::inertia("/retos/crear", "Retos/Crear");
     Route::get('/retos/{id}/crear', [RetoController::class, 'create'])
         ->name('retos.create');
     Route::post('/retos', [RetoController::class, 'store'])->name('retos.store');
     Route::get('/reto/{id}',[RetoController::class,'show']);
     Route::inertia('/construction', 'Construction')->name('construction');
+    Route::post('/reto/guardar/realizacion',[RetoController::class,'guardarRealizacionReto']);
 
     require "web/emilio.php";
     require "web/angel.php";

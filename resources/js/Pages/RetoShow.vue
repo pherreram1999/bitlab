@@ -5,6 +5,9 @@ import nibbitHappy from "@/img/Nibbit_Happy.webp";
 import nibbitSad from "@/img/Nibbit_Sad.webp";
 import {computed, onUnmounted, ref} from "vue";
 import { Link } from '@inertiajs/vue3';
+import {useAxios} from "@/composable/useAxios";
+
+const {axios} = useAxios()
 
 interface RetoAlternativa {
     inciso: string;
@@ -20,6 +23,7 @@ interface RetoOpcion {
 
 interface Reto {
     id: number;
+    grupo_id: number;
     titulo: string;
     descripcion: string;
     puntaje: number;
@@ -29,14 +33,16 @@ interface Reto {
     opciones: RetoOpcion[];
 }
 
-const props = defineProps<{ reto: Reto }>()
+const props = defineProps<{ reto: Reto, intentos_previos: number, ya_terminado: boolean, mejor_calificacion: number }>()
 
 // Estados
 const hasStarted = ref(false);
 const isFinished = ref(false);
 const showSidebar = ref(false);
 const indexReactivo = ref(0);
-const attemptsMade = ref(0);
+const attemptsMade = ref(props.intentos_previos);
+const alreadyFinished = ref(props.ya_terminado);
+const mejorCalificacion = ref(props.mejor_calificacion);
 const timeLeft = ref(0);
 let timerInterval: any = null;
 
@@ -60,7 +66,21 @@ const formattedTime = computed(() => {
     return `${m}:${s}`;
 });
 
-const canRetry = computed(() => attemptsMade.value < props.reto.max_intentos);
+const canRetry = computed(() => !alreadyFinished.value && attemptsMade.value < props.reto.max_intentos);
+
+const isPerfectScore = computed(() => correctCount.value === reactivos.value.length);
+
+
+
+const currentScore = computed(() => {
+
+    if (reactivos.value.length === 0) return 0;
+
+    return (correctCount.value / reactivos.value.length) * props.reto.puntaje;
+
+});
+
+
 
 // Métodos
 const startReto = () => {
@@ -79,6 +99,12 @@ const finishReto = () => {
     clearInterval(timerInterval);
     isFinished.value = true;
     attemptsMade.value++;
+    
+    if (currentScore.value > mejorCalificacion.value) {
+        mejorCalificacion.value = currentScore.value;
+    }
+
+    if (isPerfectScore.value) alreadyFinished.value = true;
     saveResult();
 };
 
@@ -90,14 +116,21 @@ const retryReto = () => {
 };
 
 const saveResult = () => {
-    // Función para invocar al finalizar (aquí se puede integrar con la API)
-    console.log("Invocando guardado de resultados...", {
+    // Mapeamos los reactivos para enviar detalle de respuestas
+    const respuestas = reactivos.value.map(r => ({
+        pregunta: r.texto,
+        seleccionada: r.respuesta?.texto ?? null,
+        es_correcta: r.respuesta?.correcta ?? false,
+        correcta_texto: r.alternativas.find(a => a.correcta)?.texto ?? null
+    }));
+
+    const data = {
         reto_id: props.reto.id,
         aciertos: correctCount.value,
-        fallas: failureCount.value,
-        completado: allAnswered.value,
-        intento: attemptsMade.value
-    });
+        respuestas: respuestas
+    }
+
+    axios.post(`/reto/guardar/realizacion`, data)
 };
 
 onUnmounted(() => clearInterval(timerInterval));
@@ -106,25 +139,38 @@ onUnmounted(() => clearInterval(timerInterval));
 <template>
     <app-layout :title="reto.titulo">
         <div class="min-h-[calc(100vh-65px)] bg-gray-50">
-            
+
             <!-- 1. PANTALLA INICIAL -->
             <div v-if="!hasStarted" class="flex items-center justify-center p-4 min-h-[calc(100vh-65px)]">
                 <div class="bg-white p-6 md:p-8 rounded-3xl shadow-xl max-w-xl w-full text-center border border-gray-200">
                     <h1 class="text-2xl md:text-3xl font-black text-gray-800 mb-4">{{ reto.titulo }}</h1>
                     <p class="text-gray-500 mb-6 md:mb-8 text-sm md:text-base">{{ reto.descripcion }}</p>
-                    <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="grid grid-cols-3 gap-4 mb-8">
                         <div class="bg-orange-50 p-4 rounded-2xl border border-orange-100">
                             <span class="block text-2xl mb-1">⏱️</span>
                             <span class="text-sm font-bold text-orange-700">{{ reto.tiempo_limite }} min</span>
                         </div>
                         <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
                             <span class="block text-2xl mb-1">🔄</span>
-                            <span class="text-sm font-bold text-blue-700">{{ reto.max_intentos }} Intentos</span>
+                            <span class="text-sm font-bold text-blue-700">{{ reto.max_intentos - attemptsMade }} / {{ reto.max_intentos }}</span>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-2xl border border-green-100">
+                            <span class="block text-2xl mb-1">🏆</span>
+                            <span class="text-sm font-bold text-green-700">{{ mejorCalificacion }} / {{ reto.puntaje }}</span>
                         </div>
                     </div>
-                    <button @click="startReto" class="w-full py-4 bg-orange-600 text-white rounded-2xl font-bold text-xl hover:bg-orange-700 transition shadow-lg shadow-orange-200">
-                        Comenzar Ahora
-                    </button>
+                    <template v-if="canRetry">
+                        <button @click="startReto" class="w-full py-4 bg-orange-600 text-white rounded-2xl font-bold text-xl hover:bg-orange-700 transition shadow-lg shadow-orange-200 mb-4">
+                            Comenzar Ahora
+                        </button>
+                    </template>
+                    <div v-else class="w-full py-4 bg-gray-100 text-gray-400 rounded-2xl font-bold text-xl border border-gray-200 cursor-not-allowed mb-4">
+                        🚫 {{ alreadyFinished ? 'Reto completado' : 'Intentos agotados' }}
+                    </div>
+
+                    <Link :href="route('grupo.show', reto.grupo_id)" class="block w-full py-3 bg-white text-gray-500 rounded-2xl font-bold text-lg hover:bg-gray-50 transition border border-gray-200">
+                        Volver al Grupo
+                    </Link>
                 </div>
             </div>
 
@@ -133,7 +179,7 @@ onUnmounted(() => clearInterval(timerInterval));
                 <!-- Sidebar -->
                 <aside :class="['fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition md:translate-x-0 md:static', showSidebar ? 'translate-x-0' : '-translate-x-full']">
                     <div class="p-4 border-b border-gray-200 font-bold flex justify-between items-center">
-                        Preguntas 
+                        Preguntas
                         <button @click="showSidebar=false" class="md:hidden text-gray-400">✕</button>
                     </div>
                     <nav class="p-2 space-y-1 overflow-y-auto max-h-[calc(100vh-120px)]">
@@ -154,20 +200,20 @@ onUnmounted(() => clearInterval(timerInterval));
                             </svg>
                             Preguntas
                         </button>
-                        
+
                         <!-- Contador Visible arriba a la derecha de la carta -->
                         <div class="ml-auto bg-white px-4 py-1 md:px-6 md:py-2 rounded-2xl shadow-sm border border-orange-200 flex items-center gap-2 md:gap-3">
                             <span class="text-xs font-black text-orange-400 uppercase tracking-tighter">Tiempo</span>
                             <span class="font-mono text-xl md:text-2xl font-bold text-orange-600">{{ formattedTime }}</span>
                         </div>
                     </div>
-                    
+
                     <div class="max-w-4xl mx-auto w-full bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row border border-gray-200 min-h-[400px] md:min-h-[450px]">
                         <div class="p-4 md:p-12 flex-1 flex flex-col justify-between">
                             <div>
                                 <span class="text-orange-500 font-bold text-xs md:text-sm uppercase tracking-widest">Pregunta {{ indexReactivo + 1 }}</span>
                                 <h2 class="text-xl md:text-3xl font-bold text-gray-800 mt-2 mb-4 md:mb-8 leading-tight">{{ reactivoActual.texto }}</h2>
-                                
+
                                 <div class="space-y-2 md:space-y-3 ask-container">
                                     <button v-for="alt in reactivoActual.alternativas" :key="alt.inciso"
                                         @click="reactivoActual.respuesta = alt"
@@ -199,7 +245,7 @@ onUnmounted(() => clearInterval(timerInterval));
                                 </button>
                             </div>
                         </div>
-                        <div class="hidden md:flex w-64 bg-gray-50 items-center justify-center border-l border-gray-200 p-8">
+                        <div class="hidden 2xl:flex w-64 bg-gray-50 items-center justify-center border-l border-gray-200 p-8">
                             <img :src="nibbitAsk" class="w-full opacity-80" alt="Nibbit Ask" />
                         </div>
                     </div>
@@ -223,30 +269,35 @@ onUnmounted(() => clearInterval(timerInterval));
                     <!-- Score Card -->
                     <div :class="['p-8 md:p-12 md:w-2/5 text-center text-white flex flex-col items-center justify-center transition-colors duration-500', showHelpMessage ? 'bg-orange-600' : 'bg-green-600']">
                          <!-- Imagen Dinámica -->
-                        <img 
-                            :src="showHelpMessage ? nibbitSad : nibbitHappy" 
+                        <img
+                            :src="showHelpMessage ? nibbitSad : nibbitHappy"
                             class="w-32 h-32 md:w-56 md:h-56 object-contain mb-6 drop-shadow-2xl"
                             alt="Resultado"
                         />
 
                         <h2 class="text-3xl md:text-5xl font-black mb-2 leading-tight">{{ showHelpMessage ? '¡Ánimo!' : '¡Excelente!' }}</h2>
-                        <div class="text-6xl md:text-8xl font-black my-4 md:my-8">{{ correctCount }}/{{ reactivos.length }}</div>
+                        <div class="flex flex-col items-center my-4 md:my-8">
+                            <div class="text-6xl md:text-8xl font-black leading-none">{{ correctCount }}/{{ reactivos.length }}</div>
+                            <div class="text-xl md:text-2xl font-bold opacity-70 mt-2">Puntos: {{ currentScore }} / {{ reto.puntaje }}</div>
+                        </div>
                         <p class="mb-6 md:mb-10 opacity-90 text-lg md:text-xl">
                             {{ showHelpMessage ? 'Necesitas practicar un poco más.' : 'Has demostrado un gran dominio del tema.' }}
                         </p>
-                        
+
                         <div v-if="showHelpMessage && reto.ayuda" class="bg-black/20 p-6 rounded-2xl text-base text-left mb-8 w-full backdrop-blur-sm border border-white/10 shadow-inner">
-                            <strong class="block mb-2 text-xs uppercase opacity-70 tracking-widest">💡 Ayuda del docente:</strong> 
+                            <strong class="block mb-2 text-xs uppercase opacity-70 tracking-widest">💡 Ayuda del docente:</strong>
                             {{ reto.ayuda }}
                         </div>
 
-                        <button v-if="canRetry" @click="retryReto" class="w-full py-4 bg-white text-gray-900 rounded-2xl font-black hover:bg-gray-100 transition shadow-xl flex items-center justify-center gap-3 border border-gray-200 text-lg uppercase tracking-wider">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-                            </svg>
-                            Reintentar Reto
-                        </button>
-                        <p v-else class="text-sm opacity-60 italic mt-4 font-bold">Intentos agotados.</p>
+                        <template v-if="!isPerfectScore">
+                            <button v-if="canRetry" @click="retryReto" class="w-full py-4 bg-white text-gray-900 rounded-2xl font-black hover:bg-gray-100 transition shadow-xl flex items-center justify-center gap-3 border border-gray-200 text-lg uppercase tracking-wider">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                </svg>
+                                Reintentar Reto
+                            </button>
+                            <p v-else class="text-sm opacity-60 italic mt-4 font-bold">Intentos agotados.</p>
+                        </template>
                     </div>
 
                     <!-- Feedback List -->
@@ -292,11 +343,11 @@ onUnmounted(() => clearInterval(timerInterval));
                         </div>
 
                         <div class="mt-12 flex justify-center border-t border-gray-200 pt-8">
-                            <Link :href="route('dashboard')" class="px-8 py-3 bg-gray-100 hover:bg-gray-200 rounded-2xl font-black text-gray-500 hover:text-gray-800 transition flex items-center gap-3 text-lg">
+                            <Link :href="route('grupo.show', reto.grupo_id)" class="px-8 py-3 bg-gray-100 hover:bg-gray-200 rounded-2xl font-black text-gray-500 hover:text-gray-800 transition flex items-center gap-3 text-lg">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="size-5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
                                 </svg>
-                                Volver al Panel
+                                Volver al Grupo
                             </Link>
                         </div>
                     </div>
