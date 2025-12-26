@@ -218,67 +218,85 @@ onUnmounted(() => clearInterval(timerInterval));
             </div>
 
             <!-- 3. RESULTADOS -->
-            <div v-else class="p-4 md:p-6 flex items-center justify-center min-h-[calc(100vh-65px)]">
-                <div class="bg-white rounded-3xl shadow-2xl max-w-4xl w-full overflow-hidden flex flex-col md:flex-row border border-gray-200">
+            <div v-else class="p-2 md:p-4 flex items-center justify-center min-h-[calc(100vh-65px)]">
+                <div class="bg-white rounded-3xl shadow-2xl w-full overflow-hidden flex flex-col md:flex-row border border-gray-200 min-h-[600px]">
                     <!-- Score Card -->
-                    <div :class="['p-8 md:p-10 md:w-1/3 text-center text-white flex flex-col items-center justify-center transition-colors duration-500', showHelpMessage ? 'bg-orange-600' : 'bg-green-600']">
+                    <div :class="['p-8 md:p-12 md:w-2/5 text-center text-white flex flex-col items-center justify-center transition-colors duration-500', showHelpMessage ? 'bg-orange-600' : 'bg-green-600']">
                          <!-- Imagen Dinámica -->
                         <img 
                             :src="showHelpMessage ? nibbitSad : nibbitHappy" 
-                            class="w-32 h-32 md:w-40 md:h-40 object-contain mb-4 drop-shadow-lg"
+                            class="w-32 h-32 md:w-56 md:h-56 object-contain mb-6 drop-shadow-2xl"
                             alt="Resultado"
                         />
 
-                        <h2 class="text-3xl md:text-4xl font-black mb-2">{{ showHelpMessage ? '¡Ánimo!' : '¡Excelente!' }}</h2>
-                        <div class="text-5xl md:text-7xl font-black my-4 md:my-6">{{ correctCount }}/{{ reactivos.length }}</div>
-                        <p class="mb-6 md:mb-8 opacity-90 text-base md:text-lg">
+                        <h2 class="text-3xl md:text-5xl font-black mb-2 leading-tight">{{ showHelpMessage ? '¡Ánimo!' : '¡Excelente!' }}</h2>
+                        <div class="text-6xl md:text-8xl font-black my-4 md:my-8">{{ correctCount }}/{{ reactivos.length }}</div>
+                        <p class="mb-6 md:mb-10 opacity-90 text-lg md:text-xl">
                             {{ showHelpMessage ? 'Necesitas practicar un poco más.' : 'Has demostrado un gran dominio del tema.' }}
                         </p>
                         
-                        <div v-if="showHelpMessage && reto.ayuda" class="bg-black/20 p-4 rounded-2xl text-sm text-left mb-6 w-full backdrop-blur-sm border border-white/10">
-                            <strong class="block mb-1 text-xs uppercase opacity-70">💡 Ayuda del docente:</strong> 
+                        <div v-if="showHelpMessage && reto.ayuda" class="bg-black/20 p-6 rounded-2xl text-base text-left mb-8 w-full backdrop-blur-sm border border-white/10 shadow-inner">
+                            <strong class="block mb-2 text-xs uppercase opacity-70 tracking-widest">💡 Ayuda del docente:</strong> 
                             {{ reto.ayuda }}
                         </div>
 
-                        <button v-if="canRetry" @click="retryReto" class="w-full py-3 md:py-4 bg-white text-gray-900 rounded-2xl font-bold hover:bg-gray-100 transition shadow-xl flex items-center justify-center gap-2 border border-gray-200 text-sm md:text-base">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
+                        <button v-if="canRetry" @click="retryReto" class="w-full py-4 bg-white text-gray-900 rounded-2xl font-black hover:bg-gray-100 transition shadow-xl flex items-center justify-center gap-3 border border-gray-200 text-lg uppercase tracking-wider">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
                             </svg>
                             Reintentar Reto
                         </button>
-                        <p v-else class="text-sm opacity-60 italic mt-4">Has agotado tus intentos permitidos.</p>
+                        <p v-else class="text-sm opacity-60 italic mt-4 font-bold">Intentos agotados.</p>
                     </div>
 
                     <!-- Feedback List -->
-                    <div class="p-6 md:p-8 md:w-2/3 max-h-[60vh] md:max-h-[80vh] overflow-y-auto bg-gray-50 border-l border-gray-200">
-                        <h3 class="font-bold text-lg md:text-xl mb-6 text-gray-800 flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .415.162.798.425 1.081.263.283.629.454 1.033.454.404 0 .77-.171 1.033-.454.263-.283.425-.666.425-1.081 0-.231-.035-.454-.1-.664m-5.801 0A2.251 2.251 0 0 1 13.5 2.25c1.035 0 1.912.7 2.153 1.652m-5.801 0A2.25 2.25 0 0 0 9 6.108V19.5a2.25 2.25 0 0 0 2.25 2.25h5.25a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08" />
-                            </svg>
-                            Resumen de respuestas
-                        </h3>
-                        <div class="space-y-4">
-                            <div v-for="(r, i) in reactivos" :key="i" class="p-4 md:p-5 rounded-2xl border bg-white shadow-sm flex gap-3 md:gap-4 transition-all hover:shadow-md border-gray-200">
-                                <div :class="['shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-base md:text-lg border', r.respuesta?.correcta ? 'bg-green-100 text-green-600 border-green-200' : 'bg-red-100 text-red-600 border-red-200']">
+                    <div class="p-6 md:p-12 md:w-3/5 max-h-[70vh] md:max-h-[85vh] overflow-y-auto bg-gray-50 border-l border-gray-200">
+                        <div class="flex justify-between items-center mb-8">
+                            <h3 class="font-black text-2xl text-gray-800 flex items-center gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-8 text-gray-400">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .415.162.798.425 1.081.263.283.629.454 1.033.454.404 0 .77-.171 1.033-.454.263-.283.425-.666.425-1.081 0-.231-.035-.454-.1-.664m-5.801 0A2.251 2.251 0 0 1 13.5 2.25c1.035 0 1.912.7 2.153 1.652m-5.801 0A2.25 2.25 0 0 0 9 6.108V19.5a2.25 2.25 0 0 0 2.25 2.25h5.25a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08" />
+                                </svg>
+                                Resumen del Reto
+                            </h3>
+                            <div class="bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm text-sm font-bold text-gray-500">
+                                Total Reactivos: {{ reactivos.length }}
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div v-for="(r, i) in reactivos" :key="i" class="p-6 rounded-3xl border bg-white shadow-sm flex gap-6 transition-all hover:shadow-xl hover:scale-[1.01] border-gray-200 group">
+                                <div :class="['shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center text-xl border-2 transition-transform group-hover:rotate-6', r.respuesta?.correcta ? 'bg-green-100 text-green-600 border-green-200' : 'bg-red-100 text-red-600 border-red-200']">
                                     {{ r.respuesta?.correcta ? '✓' : '✕' }}
                                 </div>
                                 <div class="flex-1">
-                                    <p class="font-bold text-gray-800 leading-tight text-sm md:text-base">{{ i+1 }}. {{ r.texto }}</p>
-                                    <div class="mt-2 space-y-1">
-                                        <p class="text-xs md:text-sm text-gray-600">Tu respuesta: <span :class="r.respuesta?.correcta ? 'text-green-600 font-bold' : 'text-red-600 font-bold'">{{ r.respuesta?.texto || 'No respondida' }}</span></p>
-                                        <p v-if="!r.respuesta?.correcta" class="text-xs md:text-sm p-2 md:p-3 bg-green-50 rounded-xl text-green-800 mt-2 border border-green-100">
-                                            <span class="font-bold">Respuesta correcta:</span> {{ r.alternativas.find(a=>a.correcta)?.texto }}
-                                        </p>
+                                    <div class="flex justify-between items-start mb-2">
+                                        <p class="font-black text-gray-800 text-lg leading-tight">{{ i+1 }}. {{ r.texto }}</p>
+                                        <span :class="['text-[10px] uppercase font-black px-2 py-1 rounded-md tracking-widest border', r.respuesta?.correcta ? 'bg-green-50 text-green-600 border-green-200' : 'bg-red-50 text-red-600 border-red-200']">
+                                            {{ r.respuesta?.correcta ? 'Correcto' : 'Incorrecto' }}
+                                        </span>
+                                    </div>
+                                    <div class="mt-3 space-y-2">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xs font-bold text-gray-400 uppercase">Tu elección:</span>
+                                            <span :class="['text-sm font-bold', r.respuesta?.correcta ? 'text-green-600' : 'text-red-600']">
+                                                {{ r.respuesta?.texto || 'No respondida' }}
+                                            </span>
+                                        </div>
+                                        <div v-if="!r.respuesta?.correcta" class="p-4 bg-green-50 rounded-2xl text-green-800 border border-green-100 shadow-inner">
+                                            <span class="text-xs font-black uppercase text-green-600/60 block mb-1">Respuesta correcta del docente</span>
+                                            <span class="font-bold text-sm">{{ r.alternativas.find(a=>a.correcta)?.texto }}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="mt-8 md:mt-10 flex justify-center border-t border-gray-200 pt-6">
-                            <Link :href="route('dashboard')" class="font-bold text-gray-400 hover:text-gray-600 transition flex items-center gap-2 text-sm md:text-base">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-4">
+
+                        <div class="mt-12 flex justify-center border-t border-gray-200 pt-8">
+                            <Link :href="route('dashboard')" class="px-8 py-3 bg-gray-100 hover:bg-gray-200 rounded-2xl font-black text-gray-500 hover:text-gray-800 transition flex items-center gap-3 text-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="size-5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
                                 </svg>
-                                Volver al Panel Principal
+                                Volver al Panel
                             </Link>
                         </div>
                     </div>
