@@ -6,6 +6,7 @@ import {onBeforeMount, ref, shallowRef} from "vue";
 import {useAxios} from "@/composable/useAxios";
 import {useUser} from "@/composable/useUser";
 import {router} from "@inertiajs/vue3";
+import Medal from "@/Components/Medal.vue";
 
 const { axios: client } = useAxios()
 
@@ -71,7 +72,21 @@ const abrirReto = (r: any) => {
 <template>
     <SidebarOnlyLayout>
         <section class="mt-4">
-            <div class="rounded-xl overflow-hidden flex items-center" :style="{ background: '#2B2E36', height: '110px' }">
+            <div class="rounded-xl overflow-hidden flex flex-col sm:flex-row items-start sm:items-center sm:justify-between" :style="{ background: '#2B2E36'}">
+                <div class="pl-8 pr-2 py-5 w-full">
+                    <div class="text-2xl lg:text-4xl 2xl:text-5xl font-bold tracking-wide pb-5 text-[#E17101] not-sm:flex not-sm:justify-center not-sm:items-center">
+                        {{ user.nombre }} {{user.apellido_paterno}} {{user.apellido_materno}}
+                    </div>
+                    <div class="mt-2 text-md lg:text-lg 2xl:text-2xl font-semibold" :style="{ color: '#FFFFFF' }">
+                        <div>Puntaje total: </div>
+                        <div>Porcentaje promedio: </div>
+                    </div>
+                </div>
+                <div class="pr-2 py-2 lg:pr-4 2xl:pr-10 not-sm:w-full not-sm:flex not-sm:items-center not-sm:justify-center">
+                    <Medal/>
+                </div>
+            </div>
+            <div class="rounded-xl overflow-hidden flex items-center mt-4" :style="{ background: '#2B2E36', height: '110px' }">
                 <div class="px-8">
                     <div class="text-4xl font-bold tracking-wide" :style="{ color: '#FFFFFF' }">
                         {{ grupo.nombre }}
@@ -100,8 +115,8 @@ const abrirReto = (r: any) => {
                     </button>
                 </div>
 
-                <div class="codePill px-4 py-2">
-                    Codigo del grupo: <span class="font-extrabold bg-stone-200 px-4 py-1 rounded-lg select-all">{{ grupo.clave }}</span>
+                <div class="codePill px-4 py-2 flex flex-row items-center">
+                    <div class="not-sm:hidden md:hidden lg:block pr-5">Codigo del grupo: </div><span class="font-extrabold bg-stone-200 px-4 py-1 rounded-lg select-all">{{ grupo.clave }}</span>
                 </div>
             </div>
         </section>
