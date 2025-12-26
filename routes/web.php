@@ -7,6 +7,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\RetoController;
+use App\Http\Controllers\FeedbackController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -44,6 +45,10 @@ Route::middleware([
     Route::get('/reto/{id}',[RetoController::class,'show']);
     Route::inertia('/construction', 'Construction')->name('construction');
     Route::post('/reto/guardar/realizacion',[RetoController::class,'guardarRealizacionReto']);
+    
+    // Feedback
+    Route::get('/feedback', [FeedbackController::class, 'create'])->name('feedback.create');
+    Route::post('/feedback', [FeedbackController::class, 'store'])->name('feedback.store');
 
     require "web/emilio.php";
     require "web/angel.php";

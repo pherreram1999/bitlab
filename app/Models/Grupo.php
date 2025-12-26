@@ -23,6 +23,13 @@ class Grupo extends Model
         'concluido' => 'boolean',
         'created_at' => 'datetime:d/m/Y H:i:s',
     ];
+    protected $appends = ['total_puntos'];
+
+    public function getTotalPuntosAttribute()
+    {
+        return $this->retos()->sum('puntaje');
+    }
+
     public function profesor(): BelongsTo
     {
         return $this->belongsTo(User::class,'usuario_id');

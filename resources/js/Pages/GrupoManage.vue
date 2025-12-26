@@ -60,11 +60,11 @@ onBeforeMount(() => {
 
 
 const abrirReto = (r: any) => {
-    // depediento el ROL
-    if (user.rol.clave === 'PROFESOR') // es una vista pendiente
+    if (user.rol.clave === 'PROFESOR') {
         router.visit('/construction')
-    // retornamos al vista para resolver el reto
-    router.visit(`/reto/${r.id}`)
+    } else {
+        router.visit(`/reto/${r.id}`)
+    }
 }
 
 </script>
@@ -121,9 +121,45 @@ const abrirReto = (r: any) => {
             </div>
         </section>
         <Transition>
-            <section v-if="tab === Tabs.Miembros" class="mt-4">
-                <div class="px-4 py-2 bg-white rounded-lg" v-for="m of miembros">
-                    {{ m.nombre }}
+            <section v-if="tab === Tabs.Miembros" class="mt-4 space-y-3">
+                <div class="px-6 py-4 bg-white rounded-2xl shadow-sm border border-gray-100 grid items-center gap-4" 
+                     :class="user.rol.clave === 'PROFESOR' ? 'md:grid-cols-3' : 'grid-cols-1'"
+                     v-for="m of miembros" :key="m.id">
+                    
+                    <!-- Información del Alumno -->
+                    <div class="flex items-center gap-4">
+                        <div class="size-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-xl border-2 border-orange-200 shrink-0">
+                            {{ m.nombre.charAt(0) }}{{ m.apellido_paterno.charAt(0) }}
+                        </div>
+                        <div class="min-w-0">
+                            <p class="font-black text-gray-800 text-lg leading-tight truncate">
+                                {{ m.nombre }} {{ m.apellido_paterno }} {{ m.apellido_materno }}
+                            </p>
+                            <p v-if="user.rol.clave === 'PROFESOR'" class="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">
+                                Matrícula: {{ m.matricula }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Avance (Solo Profesor) -->
+                    <div v-if="user.rol.clave === 'PROFESOR'" class="w-full">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs font-black text-gray-400 uppercase">Avance</span>
+                            <span class="text-sm font-black text-orange-600">{{ m.porcentaje_avance }}%</span>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                            <div class="bg-orange-500 h-full rounded-full transition-all duration-500" :style="{ width: m.porcentaje_avance + '%' }"></div>
+                        </div>
+                    </div>
+
+                    <!-- Puntaje (Solo Profesor) -->
+                    <div v-if="user.rol.clave === 'PROFESOR'" class="flex flex-col md:items-end">
+                        <span class="text-xs font-black text-gray-400 uppercase tracking-tighter">Puntos Obtenidos</span>
+                        <span class="text-xl font-black text-gray-800">
+                            {{ m.puntos_obtenidos }} 
+                            <span class="text-gray-300 text-sm font-normal">/ {{ m.total_puntos_grupo }}</span>
+                        </span>
+                    </div>
                 </div>
             </section>
             <section class="mt-4" v-else>
