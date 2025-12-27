@@ -8,9 +8,12 @@ import {useUser} from "@/composable/useUser";
 import {router} from "@inertiajs/vue3";
 import Medal from "@/Components/Medal.vue";
 import MedalGroup from "@/Components/MedalGroup.vue";
+// --- NUEVOS IMPORTS PARA EL MODAL ---
+import ConfirmationModal from "@/Components/ConfirmationModal.vue";
+import DangerButton from "@/Components/DangerButton.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 
 const { axios: client } = useAxios()
-
 const user = useUser()
 
 interface Props {
@@ -19,7 +22,7 @@ interface Props {
 
 const props = defineProps({
     grupo: Object,
-    grupos: Array, // <--- 1. Agrega esta prop para recibir la lista
+    grupos: Array,
 });
 
 enum Tabs {
@@ -30,10 +33,43 @@ enum Tabs {
 const miembros = shallowRef([])
 const miembro = ref()
 const retos = shallowRef([])
-
 const tab = ref<Tabs>(Tabs.Retos)
 
+// --- LÓGICA PARA ELIMINAR ALUMNO ---
+const confirmingRemoval = ref(false);
+const studentToRemove = ref(null);
+
+const confirmRemoval = (student: any) => {
+    studentToRemove.value = student;
+    confirmingRemoval.value = true;
+};
+
+const closeModal = () => {
+    confirmingRemoval.value = false;
+    setTimeout(() => { studentToRemove.value = null; }, 200);
+};
+
+const executeRemoval = () => {
+    if (!studentToRemove.value) return;
+
+    router.delete(route('grupos.miembros.destroy', {
+        grupo: props.grupo.id,
+        user: studentToRemove.value.id
+    }), {
+        preserveScroll: true,
+        onSuccess: () => {
+            closeModal();
+            // IMPORTANTE: Volvemos a pedir los miembros para actualizar la lista
+            // ya que 'miembros' no es una prop, sino un estado local.
+            getMembers();
+        }
+    });
+};
+// -----------------------------------
+
 const getMembers = async () => {
+    // Nota: Asegúrate de que tu backend responda a esto.
+    // Si usas el código anterior, POST está bien, aunque usualmente es GET.
     const {data} = await client.post(`/grupo/${props.grupo.id}/miembros`)
     miembros.value = data
 }
@@ -41,7 +77,6 @@ const getMembers = async () => {
 const puntajeMax = async () => {
     const {data} = await client.post(`/grupo/${props.grupo.id}/miembro/${user.id}`)
     miembro.value = data
-    console.log(miembro.value)
 }
 
 const getRetos = async () => {
@@ -62,8 +97,6 @@ const select = async (t: Tabs) => {
             break
     }
 }
-
-// por defecto debemos cargar los retos
 
 onBeforeMount(() => {
     getRetos()
@@ -113,6 +146,7 @@ const abrirReto = (r: any) => {
                 </div>
             </div>
         </section>
+
         <section class="rounded bg-white mt-4">
             <div class="flex items-center justify-between">
                 <div class="flex items-end">
@@ -136,14 +170,14 @@ const abrirReto = (r: any) => {
                 </div>
             </div>
         </section>
+
         <Transition>
             <section v-if="tab === Tabs.Miembros" class="mt-4 space-y-3">
                 <div class="px-6 py-4 bg-white rounded-2xl shadow-sm border border-gray-100 grid items-center gap-4"
-                     :class="user.rol.clave === 'PROFESOR' ? 'md:grid-cols-3' : 'grid-cols-2'"
+                     :class="user.rol.clave === 'PROFESOR' ? 'md:grid-cols-12' : 'grid-cols-2'"
                      v-for="m of miembros" :key="m.id">
 
-                    <!-- Información del Alumno -->
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-4" :class="user.rol.clave === 'PROFESOR' ? 'col-span-12 md:col-span-4' : 'col-span-1'">
                         <div class="size-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-xl border-2 border-orange-200 shrink-0">
                             {{ m.nombre.charAt(0) }}{{ m.apellido_paterno.charAt(0) }}
                         </div>
@@ -157,8 +191,7 @@ const abrirReto = (r: any) => {
                         </div>
                     </div>
 
-                    <!-- Avance (Solo Profesor) -->
-                    <div v-if="user.rol.clave === 'PROFESOR'" class="w-full">
+                    <div v-if="user.rol.clave === 'PROFESOR'" class="w-full col-span-12 md:col-span-4">
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-xs font-black text-gray-400 uppercase">Avance</span>
                             <span class="text-sm font-black text-orange-600">{{ m.porcentaje_avance }}%</span>
@@ -168,23 +201,40 @@ const abrirReto = (r: any) => {
                         </div>
                     </div>
 
-                    <!-- Puntaje (Solo Profesor) -->
-                    <div class="grid grid-cols-2">
-                    <div v-if="user.rol.clave === 'PROFESOR'" class="flex flex-col md:items-end">
-                        <span class="text-xs font-black text-gray-400 uppercase tracking-tighter">Puntos Obtenidos</span>
-                        <span class="text-xl font-black text-gray-800">
-                            {{ m.puntos_obtenidos }}
-                            <span class="text-gray-300 text-sm font-normal">/ {{ m.total_puntos_grupo }}</span>
-                        </span>
-
-                    </div>
+                    <div v-if="user.rol.clave === 'PROFESOR'" class="col-span-10 md:col-span-3 flex items-center justify-between md:justify-end gap-4">
+                        <div class="flex flex-col md:items-end">
+                            <span class="text-xs font-black text-gray-400 uppercase tracking-tighter">Puntos Obtenidos</span>
+                            <span class="text-xl font-black text-gray-800">
+                                {{ m.puntos_obtenidos }}
+                                <span class="text-gray-300 text-sm font-normal">/ {{ m.total_puntos_grupo }}</span>
+                            </span>
+                        </div>
                         <MedalGroup :porcentaje="m?.porcentaje_avance || 0" class="flex items-center justify-end"/>
                     </div>
+
+                    <div v-if="user.rol.clave === 'PROFESOR'" class="col-span-2 md:col-span-1 flex justify-end">
+                        <button
+                            v-if="grupo.usuario_id === user.id"
+                            @click="confirmRemoval(m)"
+                            class="flex items-center justify-center w-9 h-9 rounded-full bg-gray-700 hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 shadow-sm"
+                            title="Eliminar alumno"
+                            type="button"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-orange-500">
+                                <path fill-rule="evenodd" d="M4.25 12a.75.75 0 0 1 .75-.75h14a.75.75 0 0 1 0 1.5H5a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div v-if="user.rol.clave !== 'PROFESOR'" class="col-span-1 flex justify-end">
+                    </div>
+
                 </div>
             </section>
+
             <section class="mt-4" v-else>
                 <div @click.prevent="abrirReto(r)"
-                    class="px-4 py-2  bg-white my-2 rounded-lg flex justify-between
+                     class="px-4 py-2  bg-white my-2 rounded-lg flex justify-between
                     hover:shadow-lg cursor-pointer transition-all transform hover:-translate-y-0.5"
                      v-for="r of retos">
                     <h2 class="font-semibold px-4 py-2">{{ r.titulo }}</h2>
@@ -193,7 +243,6 @@ const abrirReto = (r: any) => {
 
                     </div>
                 </div>
-                <!-- Enlace para crear un reto !-->
                 <Link class="fabBtn" v-if="user.rol.clave === 'PROFESOR'"
                       :href="`/retos/${grupo.id}/crear`"
                       aria-label="Unirse a un grupo">
@@ -203,7 +252,32 @@ const abrirReto = (r: any) => {
             </section>
         </Transition>
 
+        <ConfirmationModal :show="confirmingRemoval" @close="closeModal">
+            <template #title>
+                Eliminar Alumno
+            </template>
 
+            <template #content>
+                ¿Estás seguro de que deseas eliminar a
+                <b>{{ studentToRemove?.nombre }} {{ studentToRemove?.apellido_paterno }}</b>
+                del grupo? Esta acción es irreversible y eliminará su progreso en este grupo.
+            </template>
+
+            <template #footer>
+                <SecondaryButton @click="closeModal">
+                    Cancelar
+                </SecondaryButton>
+
+                <DangerButton
+                    class="ml-3"
+                    @click="executeRemoval"
+                    :class="{ 'opacity-25': !studentToRemove }"
+                    :disabled="!studentToRemove"
+                >
+                    Eliminar
+                </DangerButton>
+            </template>
+        </ConfirmationModal>
 
     </SidebarOnlyLayout>
 </template>
