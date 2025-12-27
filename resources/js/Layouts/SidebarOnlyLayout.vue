@@ -1,34 +1,31 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { Link } from "@inertiajs/vue3";
-import { ref } from "vue";
+import { Link, usePage } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
+import { getGrupoUri } from "@/composable/getGrupoUri.ts";
+import { useUser } from "@/composable/useUser.ts";
 
+const user = useUser();
+const page = usePage();
 const isMobileMenuOpen = ref(false);
 
 const props = defineProps({
     title: { type: String, default: "Dashboard" },
 
-    // groups: [{ id, nombre, ... }]
-    groups: { type: Array, default: () => [] },
+    // ✅ esto es lo que tú pasas desde GruposDashboard.vue
+    groups: { type: Array, default: null },
 
     // grupo seleccionado (para pintar naranja)
     activeGroupId: { type: [Number, String, null], default: null },
 
-    // ✅ base real para construir rutas de grupo
-    // alumno:  "/alumnos/grupos"
-    // profesor: "/profesor/grupos" (si algún día lo usas)
-    baseGroupHref: { type: String, default: "/alumnos/grupos" },
-
     // a dónde manda Home
-    hrefHome: { type: String, default: "/alumnos/grupos" },
+    hrefHome: { type: String, default: "/dashboard" },
 });
 
-function groupHref(g) {
-    if (!g?.id) return "#";
-    // ✅ SIEMPRE manda a retos
-    return `${props.baseGroupHref}/${g.id}/retos`;
-}
+// ✅ ahora sí respeta el prop; si no viene, cae a page.props.grupos
+const groups = computed(() => props.groups ?? page.props.grupos ?? []);
 </script>
+
 
 <template>
     <app-layout :title="props.title">
@@ -71,11 +68,12 @@ function groupHref(g) {
 
                     <!-- GRUPOS -->
                     <Link
-                        v-for="g in props.groups"
+                        v-for="g in groups"
                         :key="g.id"
-                        :href="groupHref(g)"
+                        :href="`/grupo/${g.id}`"
                         class="sidebarBtn"
-                        :class="{ 'sidebarBtn--selected': String(props.activeGroupId) === String(g.id) }" @click="isMobileMenuOpen = false"
+                        :class="{ 'sidebarBtn--selected': String(props.activeGroupId) === String(g.id) }"
+                        @click="isMobileMenuOpen = false"
                         :style="{ width: '280px', height: '61px' }"
                     >
                         <span class="sidebarText">{{ g.nombre ?? "Grupo" }}</span>
@@ -83,7 +81,7 @@ function groupHref(g) {
 
                     <!-- fallback si no hay grupos -->
                     <div
-                        v-if="!props.groups?.length"
+                        v-if="!groups?.length"
                         class="sidebarBtn"
                         :style="{ width: '280px', height: '61px', opacity: 0.75 }"
                     >

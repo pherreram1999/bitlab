@@ -2,10 +2,8 @@
 import { computed } from "vue";
 import SidebarOnlyLayout from "@/Layouts/SidebarOnlyLayout.vue";
 import GruposRightLayout from "@/Layouts/GruposRightLayout.vue";
-import { usePage } from "@inertiajs/vue3";
 
-const page = usePage();
-console.log("PROPS INERTIA:", page.props);
+
 
 const props = defineProps({
     // sidebar grupos (puede venir como groups o gruposSidebar)
@@ -91,8 +89,8 @@ const avgPercent = computed(() => Number(props.avgPercent ?? 0));
 
         :groups="sidebarGroups"
         :activeGroupId="groupId"
-        hrefHome="/alumnos/grupos"
-        baseGroupHref="/alumnos/grupos"
+        hrefHome="/dashboard"
+
 
     >
         <GruposRightLayout

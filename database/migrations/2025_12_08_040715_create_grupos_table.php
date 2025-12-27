@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('clave',50)->unique();
             $table->string('nombre',100);
             $table->string('portada')->nullable(); // path
+            $table->string('color')->nullable();
             $table->string('descripcion')-> nullable();
             $table->boolean('concluido')->default(false);
             $table->timestamps();

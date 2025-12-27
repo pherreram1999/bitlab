@@ -16,12 +16,13 @@ class Reto extends Model
         'puntaje',
         'opciones',
         'max_intentos',
+        'tiempo_limite',
         'ayuda',
         'fecha_limite',
     ];
     protected $casts = [
         'opciones' => 'array',
-        'fecha_limite' => 'datetime',
+        'fecha_limite' => 'datetime:d/m/Y H:i',
     ];
     public function grupo(): BelongsTo
     {

@@ -1,262 +1,53 @@
 <script setup>
-import { Head, Link } from "@inertiajs/vue3";
+import {Head, Link} from "@inertiajs/vue3";
 import ApplicationMark from "@/Components/ApplicationMark.vue";
+import InicioAppLayout from "@/Layouts/InicioAppLayout.vue";
+import AuthenticationCardLogo from "@/Components/AuthenticationCardLogo.vue";
+import { Dropdown, Tooltip, Menu, vTooltip } from 'floating-vue'
 </script>
 
 <template>
-    <Head title="BITLAB" />
-
-    <!-- HEADER -->
-    <header class="topNav">
-        <div class="navWrap">
-            <div class="navRow">
-                <!-- Logo  -->
-                <Link href="/" class="brandWrap" aria-label="Ir a inicio">
-                    <ApplicationMark class="logoMark" />
-                </Link>
-
-                <!-- Acciones derecha -->
-                <div class="navActions">
-                    <Link href="/login" class="navLogin">Iniciar sesion</Link>
-                    <Link
-                        href="/register"
-                        class="h-[44px] px-[18px] flex items-center justify-center rounded-[14px] bg-[#E17101] text-white font-bold text-[16px] transition-all duration-150 hover:bg-[#e78728] hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
-                    >
-                        Registrarse
-                    </Link>
-
+    <Head title="welcome"/>
+    <InicioAppLayout>
+        <template #inic>
+            <a href="/login"
+               class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2B67A3]">
+                Iniciar sesión
+            </a>
+            <a href="/register"
+               class="inline-flex items-center px-4 py-2 bg-[#E17101] border border-transparent rounded-md font-semibold text-xs text-white tracking-widest hover:bg-[#e78728] focus:bg-[#e78728] active:bg-[#c46100] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 transition ease-in-out duration-150 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                Registrate
+            </a>
+        </template>
+        <div
+            class="flex flex-col-reverse lg:flex-row items-center lg:items-start justify-end lg:justify-center pt-20 lg:pt-35 bg-[#E5EDF9] min-h-screen px-5 gap-10 2xl:gap-20">
+            <div
+                class="flex flex-col gap-10 w-full sm:min-w-md xl:min-w-xl 2xl:min-w-2xl sm:max-w-md xl:max-w-xl 2xl:max-w-2xl">
+                <div class="flex justify-center text-5xl 2xl:text-6xl font-bold text-[#E17101]">BITLAB</div>
+                <div class="flex justify-baseline text-2xl xl:text-3xl 2xl:text-4xl font-semibold">Aprender haciendo,
+                    juntos
                 </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- BODY -->
-    <main class="page">
-        <section class="hero">
-            <!-- IZQUIERDA -->
-            <div class="heroLeft">
-                <!-- brandText centrado y naranja -->
-                <div class="brandTextHero">BITLAB</div>
-
-                <!-- Eslogan (544x119) -->
-                <div class="sloganBox">
-                    <p class="heroTitle">Aprender haciendo, juntos.</p>
-                    <p class="heroDesc">
-                        Combinamos la práctica, la colaboración y la motivación en una experiencia de
-                        aprendizaje innovadora.
-                    </p>
+                <div class="flex justify-baseline text-md xl:text-xl 2xl:text-2xl">
+                    Combinamos la práctica, la colaboración y la motivación en una experiencia de aprendizaje
+                    innovadora.
                 </div>
-
-                <!-- Botones centrados -->
-                <div class="heroBtns">
-                    <Link
-                        href="/register"
-                        class="w-[273px] h-[50px] flex items-center justify-center rounded-[14px] bg-[#E17101] text-white font-extrabold text-[16px] transition-all duration-150 hover:bg-[#e78728] hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
-                    >
-                        Aventurate al conocimiento
-                    </Link>
-                    <Link
-                        href="/login"
-                        class="w-[338px] h-[50px] flex items-center justify-center rounded-[14px] bg-white text-black border border-[#3B3F48] font-bold text-[16px] transition-all duration-150 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
-                    >
+                <div class="flex flex-col justify-center items-center gap-7 pb-10">
+                    <a href="/register"
+                       class="flex items-center justify-center w-full sm:w-fit px-6 py-3 bg-[#E17101] border border-transparent rounded-md font-semibold text-xs sm:text-sm text-white tracking-widest hover:bg-[#e78728] focus:bg-[#e78728] active:bg-[#c46100] focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 transition ease-in-out duration-150 hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                        Aventúrate al conocimiento
+                    </a>
+                    <a href="/login"
+                       class="flex items-center justify-center w-full sm:w-fit px-6 py-3 bg-white border border-[#3B3F48] hover:border-hidden rounded-md font-semibold text-xs sm:text-sm text-black hover:text-white focus:text-white tracking-widest hover:bg-[#2B67A3] focus:bg-[#2B67A3] active:bg-[#14375B] focus:outline-none focus:ring-2 focus:ring-[#2B67A3] focus:ring-offset-2 disabled:opacity-50 transition ease-in-out duration-150 hover:shadow-lg hover:-translate-y-0.5 transition-all">
                         ¿Ya tienes una cuenta? Inicia sesión
-                    </Link>
+                    </a>
                 </div>
             </div>
-
-            <!-- DERECHA -->
-            <div class="heroRight">
-                <div class="imgCard">
-                    <div class="imgPlaceholder">Aqui va imagen</div>
-                    <!-- <img class="heroImg" src="/images/landing.png" alt="Imagen decorativa" /> -->
-                </div>
-            </div>
-        </section>
-    </main>
+            <AuthenticationCardLogo
+                class="flex h-50 sm:h-70 xl:h-90 w-80 sm:w-120 xl:w-140 justify-center items-center"/>
+        </div>
+    </InicioAppLayout>
 </template>
 
 <style scoped>
-/* =========================
-   BASE
-   ========================= */
-.page{
-    min-height: 100vh;
-    background: #E5EDF9;
-    padding-top: 70px; /* altura header */
-}
 
-/* =========================
-   HEADER
-   ========================= */
-.topNav{
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 50;
-    background: #E5EDF9;
-    border-bottom: 1px solid #BBC2CF;
-}
-
-.navWrap{
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 24px;
-}
-
-.navRow{
-    height: 70px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-}
-
-.brandWrap{
-    display:flex;
-    align-items:center;
-    gap: 14px;
-    text-decoration:none;
-}
-
-.logoMark{
-    height: 55px;
-    width: 161px;
-}
-
-/* acciones */
-.navActions{
-    display:flex;
-    align-items:center;
-    gap: 18px;
-}
-
-.navLogin{
-    color:#000000;
-    text-decoration: underline;
-    font-weight: 600;
-    font-size: 16px;
-}
-
-
-/* =========================
-   HERO
-   ========================= */
-.hero{
-    margin: 0 auto;
-    padding: 0;                /* ya no usamos padding general */
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 64px;
-    align-items:center;
-}
-
-/* heroLeft: 544x468, separado 64 izq y 44 top/bottom */
-.heroLeft{
-    width: 544px;
-    height: 468px;
-    margin-left: 64px;
-    margin-top: 44px;
-    margin-bottom: 44px;
-}
-
-/* brandText: centrado y naranja */
-.brandTextHero{
-    width: 544px;
-    margin-top: 44px;
-    text-align: center;
-    color: #E17101;
-    font-weight: 700;
-    font-size: 48px;
-    letter-spacing: 1px;
-    margin-bottom: 18px;
-}
-
-/* Eslogan: 544x119 */
-.sloganBox{
-    width: 544px;
-    height: 119px;
-}
-
-.heroTitle{
-    font-size: 30px;
-    font-weight: 900;
-    color:#000000;
-    margin: 0 0 10px 0;
-}
-
-.heroDesc{
-    color:#3B3F48;
-    font-size: 16px;
-    line-height: 1.5;
-    margin: 0;
-    max-width: 544px;
-}
-
-/* botones centrados */
-.heroBtns{
-    margin-top: 28px;
-    display:flex;
-    flex-direction: column;
-    gap: 16px;
-    align-items: center;
-}
-
-/* heroRight: 544x432, separado 64 der y 62 top/bottom */
-.heroRight{
-    width: 544px;
-    height: 432px;
-    margin-right: 64px;
-    margin-top: 62px;
-    margin-bottom: 62px;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
-
-/* contenedor imagen también 544x432 */
-.imgCard{
-    width: 544px;
-    height: 432px;
-    border-radius: 18px;
-    overflow:hidden;
-    background: #DADDE0;
-    position: relative;
-}
-
-.imgPlaceholder{
-    position:absolute;
-    top: 14px;
-    left: 16px;
-    color:#000000;
-    font-weight: 600;
-}
-
-.heroImg{
-    width:100%;
-    height:100%;
-    object-fit: cover;
-    display:block;
-}
-
-/* RESPONSIVE (si quieres mantenerlo igual, lo dejo mínimo) */
-@media (max-width: 1100px){
-    .hero{
-        grid-template-columns: 1fr;
-        gap: 24px;
-    }
-    .heroLeft, .heroRight{
-        margin-left: 24px;
-        margin-right: 24px;
-        width: auto;
-    }
-    .sloganBox{
-        width: 100%;
-        height: auto;
-    }
-    .brandTextHero{
-        width: 100px;
-    }
-    .imgCard{
-        width: 100%;
-    }
-}
 </style>

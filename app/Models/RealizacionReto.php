@@ -12,6 +12,10 @@ class RealizacionReto extends Model
         'usuario_id',
         'reto_id',
         'calificacion',
+        'puntaje_max',
+        'aciertos',
+        'total_reactivos',
+        'es_mejor_intento',
         'no_intentos',
         'fecha_realizacion',
         'respuesta',
@@ -20,6 +24,7 @@ class RealizacionReto extends Model
     protected $casts = [
         'respuesta' => 'array',
         'calificado'=>'boolean',
+        'es_mejor_intento' => 'boolean',
         'fecha_realizacion'=>'datetime',
     ];
     public function usuario():BelongsTo

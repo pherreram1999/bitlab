@@ -6,6 +6,7 @@ use App\Models\Grupo;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class GrupoController extends Controller
@@ -16,9 +17,7 @@ class GrupoController extends Controller
         // dependiendo el ROL
 
 
-        return Inertia::render('Grupos', [
-            'grupos' => $user->grupos
-        ]);
+        return Inertia::render('GruposDashboard');
     }
 
     public function create()
@@ -45,19 +44,122 @@ class GrupoController extends Controller
         $validated = $request->validate([
             'nombre' => 'required|string|max:100',
             'descripcion' => 'nullable|string|max:500',
+            'portada' => 'nullable|image|mimes:jpeg,png,jpg,svg,webp|max:2048',
         ]);
 
         do {
             $claveGenerada = mt_rand(10000, 99999);
         } while (Grupo::where('clave', $claveGenerada)->exists());
 
+        $rutaPortada = null;
+        $colorAleatorio = null;
+
+        if ($request->hasFile('portada')) {
+            $rutaPortada = Storage::disk('public')->putFile('grupos', $request->file('portada'));
+        } else {
+            $colores = [
+                '#F97316', '#3B82F6', '#10B981', '#8B5CF6', '#EF4444', '#EC4899'
+            ];
+            $colorAleatorio = $colores[array_rand($colores)];
+        }
+
         $request->user()->grupos()->create([
             'nombre' => $validated['nombre'],
             'descripcion' => $validated['descripcion'],
             'clave' => $claveGenerada,
             'concluido' => false,
-            'usuario_id' => Auth::id() // para el usuario creador del grupo
+            'usuario_id' => Auth::id(),
+            'portada' => $rutaPortada,
+            'color' => $colorAleatorio
         ]);
         return redirect()->route('dashboard');
     }
+
+    function show($id){
+        // mostramos los datos
+        $grupo = Grupo::query()->findOrFail($id);
+        return Inertia::render('GrupoManage', ['grupo' => $grupo]);
+    }
+
+    public function getMembers(Request $request, $id){
+        $grupo = Grupo::findOrFail($id);
+
+        // 1. Puntos totales posibles del grupo (suma de puntajes de los retos)
+        $retos = $grupo->retos()->get(); // Obtenemos modelos para sumar
+        $retosIds = $retos->pluck('id');
+        $totalPuntosPosibles = $retos->sum('puntaje');
+
+        /** @var User $user */
+        $user = Auth::user();
+
+        // 2. Obtener alumnos inscritos
+        $alumnos = User::query()
+            ->join('inscripciones', 'users.id', '=', 'inscripciones.usuario_id')
+            ->where('inscripciones.grupo_id', $id)
+            ->where('users.id', '!=', $user->id) // Excluir al usuario actual (profesor)
+            ->where('estado', 1)
+            ->select(
+                'users.id',
+                'users.nombre',
+                'users.apellido_paterno',
+                'users.apellido_materno',
+                'users.matricula',
+                'users.email',
+                'users.profile_photo_path'
+            )
+            ->get();
+
+        // 3. Calcular estadísticas por alumno
+        $alumnos->transform(function ($alumno) use ($retosIds, $totalPuntosPosibles) {
+            // Sumar las calificaciones de los "mejores intentos" en los retos de este grupo
+            $puntosObtenidos = \App\Models\RealizacionReto::whereIn('reto_id', $retosIds)
+                ->where('usuario_id', $alumno->id)
+                ->where('es_mejor_intento', true)
+                ->sum('calificacion');
+
+            $porcentaje = $totalPuntosPosibles > 0
+                ? ($puntosObtenidos / $totalPuntosPosibles) * 100
+                : 0;
+
+            $alumno->puntos_obtenidos = round($puntosObtenidos, 2);
+            $alumno->total_puntos_grupo = $totalPuntosPosibles;
+            $alumno->porcentaje_avance = round($porcentaje, 1);
+
+            return $alumno;
+        });
+
+        return response()->json($alumnos);
+    }
+
+    public function getRetos($id){
+        $grupo = Grupo::query()
+            ->findOrFail($id);
+
+        $retos = $grupo
+            ->retos()
+            ->select('id','titulo','fecha_limite')
+            ->get();
+
+        return response()->json($retos);
+    }
+
+    //para eliminar la imagen si se borra el grupo
+    public function destroy(Grupo $grupo)
+    {
+        if ($grupo->usuario_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($grupo->portada) {
+            if (Storage::disk('public')->exists($grupo->portada)) {
+                Storage::disk('public')->delete($grupo->portada);
+            }
+        }
+
+        $grupo->delete();
+
+        return redirect()->route('dashboard');
+    }
+
+
 }

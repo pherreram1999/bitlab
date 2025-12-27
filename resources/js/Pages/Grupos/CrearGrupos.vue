@@ -5,7 +5,8 @@ import bitlabIsologo from '../../../img/bitLab_isologo.webp';
 
 const form = useForm({
     nombre: '',
-    descripcion: ''
+    descripcion: '',
+    portada: null
 });
 
 function guardarGrupo() {
@@ -35,6 +36,32 @@ function guardarGrupo() {
                     <h1 class="text-3xl font-bold text-orange-500 mb-8 text-center md:text-left">
                         Crear Grupo
                     </h1>
+                    <div class="space-y-2 mb-4">
+                        <label class="block text-sm font-medium text-gray-700">Portada del Grupo</label>
+
+                        <div class="flex items-center gap-4">
+                            <label class="cursor-pointer bg-white border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50 transition flex items-center gap-2 shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-500">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                                </svg>
+                                <span class="text-sm text-gray-600">Subir imagen</span>
+                                <input
+                                    type="file"
+                                    @input="form.portada = $event.target.files[0]"
+                                    class="hidden"
+                                    accept="image/*"
+                                >
+                            </label>
+
+                            <span v-if="form.portada" class="text-xs text-orange-600 font-medium truncate max-w-[200px]">
+                                {{ form.portada.name }}
+                            </span>
+                            <span v-else class="text-xs text-gray-400">
+                                Opcional (se asignará color si está vacío)
+                            </span>
+                        </div>
+                        <div v-if="form.errors.portada" class="text-red-500 text-xs">{{ form.errors.portada }}</div>
+                    </div>
 
                     <div class="space-y-6">
                         <div class="space-y-1">

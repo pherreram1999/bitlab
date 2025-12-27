@@ -2,11 +2,6 @@
 import { computed } from "vue";
 import SidebarOnlyLayout from "@/Layouts/SidebarOnlyLayout.vue";
 import GruposRightLayout from "@/Layouts/GruposRightLayout.vue";
-import { usePage } from "@inertiajs/vue3";
-
-// DEBUG (opcional)
-const page = usePage();
-console.log("PROPS INERTIA:", page.props);
 
 const props = defineProps({
     // sidebar grupos (puede venir como groups o gruposSidebar)
@@ -26,7 +21,7 @@ const props = defineProps({
     hrefRetos: { type: String, default: "" },
     hrefMiembros: { type: String, default: "" },
 
-    // ✅ ESTOS TE FALTABAN (son los que ves “estáticos”)
+
     studentName: { type: String, default: "" },
     totalPoints: { type: [Number, String], default: 0 },
     avgPercent: { type: [Number, String], default: 0 },
@@ -73,9 +68,7 @@ const avgPercent = computed(() => props.avgPercent ?? 0);
     <SidebarOnlyLayout
         :groups="sidebarGroups"
         :activeGroupId="groupId"
-        hrefHome="/alumnos/grupos"
-        baseGroupHref="/alumnos/grupos"
-
+        hrefHome="/dashboard"
     >
         <GruposRightLayout
             activeTab="miembros"
@@ -88,7 +81,6 @@ const avgPercent = computed(() => props.avgPercent ?? 0);
             :totalPoints="totalPoints"
             :avgPercent="avgPercent"
         >
-            <!-- Bloque Miembros -->
             <section class="mt-4 rounded-xl" :style="{ width: '850px', background: '#E5EDF9' }">
                 <div class="space-y-5">
                     <div

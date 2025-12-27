@@ -5,15 +5,7 @@ import SidebarOnlyLayout from "@/Layouts/SidebarOnlyLayout.vue";
 import JoinGroupModal from "@/Components/JoinGroupModal.vue";
 import {useUser} from "@/composable/useUser";
 import {router} from '@inertiajs/vue3'
-
-interface Grupo {
-    id: number;
-    clave: string;
-    nombre: string;
-    portada: string;
-    descripcion: string;
-    created_at: string;
-}
+import {Grupo} from "@/interfaces";
 
 const user = useUser()
 
@@ -31,8 +23,10 @@ function openForm() {
     // en caso de que sea profesor, lo mandamos a la vista de crear
     if (user.rol.clave === 'PROFESOR')
         return router.visit('/grupos/crear')
+
     showForm.value = true;
 }
+
 
 function fmtDate(d) {
     if (!d) return "";
@@ -48,13 +42,13 @@ function fmtDate(d) {
         hrefHome="/dashboard">
 
         <div class="mx-auto px-4 md:px-0">
-            <section class="w-full max-w-[850px]">
+            <section class="w-full">
                 <div class="groupsGrid">
                     <Link
                         v-for="g in grupos"
                         :key="g.id"
                         class="groupCard"
-                        :href="`/alumnos/grupos/${g.id}/retos`"
+                        :href="`/grupo/${g.id}`"
                     >
                         <div class="cardInner">
                             <div class="cardText">
@@ -92,12 +86,16 @@ function fmtDate(d) {
 
             <!-- FAB "+" más pequeño -->
             <!-- dependiendo -->
-            <button class="fabBtn" type="button" aria-label="Unirse a un grupo" @click="openForm">
+            <button class="fabBtn" type="button"
+                    aria-label="Unirse a un grupo"
+                    @click="openForm">
                 <span class="plusV"></span>
                 <span class="plusH"></span>
             </button>
 
-            <JoinGroupModal v-if="user.rol.clave === 'ALUMNO'" :show="showForm" @close="showForm = false" />
+            <JoinGroupModal v-if="user.rol.clave === 'ALUMNO'"
+                            :show="showForm"
+                            @close="showForm = false" />
         </div>
     </SidebarOnlyLayout>
 </template>
@@ -153,58 +151,6 @@ function fmtDate(d) {
 .emptyTitle{ font-size:22px; font-weight:800; color:#2B2E36; }
 .emptyText{ margin-top:8px; color:#4B556B; }
 
-/* FAB más pequeño: 84x84 */
-.fabBtn{
-    position: fixed;
-    right: 20px;
-    bottom: 20px;
-    width: 64px;
-    height: 64px;
-    border-radius: 999px;
-    background: #3B3F48;
-    border: none;
-    cursor: pointer;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index: 50;
-}
-
-@media (min-width: 768px) {
-    .fabBtn {
-        right: 70px;
-        bottom: 70px;
-        width: 84px;
-        height: 84px;
-    }
-}
-
-/* Cruz más pequeña */
-.plusV{
-    position:absolute;
-    width: 6px;
-    height: 32px;
-    background:#E17101;
-    border-radius: 10px;
-}
-.plusH{
-    position:absolute;
-    width: 32px;
-    height: 6px;
-    background:#E17101;
-    border-radius: 10px;
-}
-
-@media (min-width: 768px) {
-    .plusV {
-        width: 8px;
-        height: 44px;
-    }
-    .plusH {
-        width: 44px;
-        height: 8px;
-    }
-}
 
 /* Responsive */
 @media (max-width: 1100px){
