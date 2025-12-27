@@ -131,6 +131,51 @@ class GrupoController extends Controller
         return response()->json($alumnos);
     }
 
+    public function getMember($grupoId, $userId){
+        $grupo = Grupo::findOrFail($grupoId);
+
+        // 1. Obtener el alumno asegurando que pertenece al grupo
+        $alumno = User::whereHas('grupos', function($q) use ($grupoId) {
+                $q->where('grupo_id', $grupoId);
+            })
+            ->select(
+                'id',
+                'nombre',
+                'apellido_paterno',
+                'apellido_materno',
+                'matricula',
+                'email',
+                'profile_photo_path'
+            )
+            ->findOrFail($userId);
+
+        // 2. Puntos totales posibles del grupo
+        $retos = $grupo->retos()->get();
+        $retosIds = $retos->pluck('id');
+        $totalPuntosPosibles = $retos->sum('puntaje');
+
+        // 3. Buscar retos realizados
+        $realizaciones = \App\Models\RealizacionReto::with('reto')
+            ->whereIn('reto_id', $retosIds)
+            ->where('usuario_id', $userId)
+            ->get();
+
+        // 4. Calcular estadísticas
+        $puntosObtenidos = $realizaciones->where('es_mejor_intento', true)->sum('calificacion');
+
+        $porcentaje = $totalPuntosPosibles > 0
+            ? ($puntosObtenidos / $totalPuntosPosibles) * 100
+            : 0;
+
+        $alumno->puntos_obtenidos = round($puntosObtenidos, 2);
+        $alumno->total_puntos_grupo = $totalPuntosPosibles;
+        $alumno->porcentaje_avance = round($porcentaje, 1);
+
+        $alumno->realizaciones = $realizaciones;
+
+        return response()->json($alumno);
+    }
+
     public function getRetos($id){
         $grupo = Grupo::query()
             ->findOrFail($id);
