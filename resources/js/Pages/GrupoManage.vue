@@ -81,7 +81,7 @@ const abrirReto = (r: any) => {
 <template>
     <SidebarOnlyLayout>
         <section class="mt-4">
-            <div class="rounded-xl overflow-hidden flex flex-col sm:flex-row items-start sm:items-center sm:justify-between" :style="{ background: '#2B2E36'}">
+            <div v-if="user.rol.clave === 'ALUMNO'" class="rounded-xl overflow-hidden flex flex-col sm:flex-row items-start sm:items-center sm:justify-between" :style="{ background: '#2B2E36'}">
                 <div class="pl-8 pr-2 py-5 w-full">
                     <div class="text-2xl lg:text-4xl 2xl:text-5xl font-bold tracking-wide pb-5 text-[#E17101] not-sm:flex not-sm:justify-center not-sm:items-center">
                         {{ user.nombre }} {{user.apellido_paterno}} {{user.apellido_materno}}
