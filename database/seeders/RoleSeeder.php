@@ -11,17 +11,17 @@ class RoleSeeder extends Seeder
     {
         $roles = [
             [
-                'clave' => 100,
+                'clave' => 'ADMIN',
                 'nombre' => 'Administrador',
                 'descripcion' => 'Acceso total al sistema'
             ],
             [
-                'clave' => 200,
+                'clave' => 'PROFESOR',
                 'nombre' => 'Profesor',
                 'descripcion' => 'Puede crear grupos y retos'
             ],
             [
-                'clave' => 300,
+                'clave' => 'ALUMNO',
                 'nombre' => 'Estudiante',
                 'descripcion' => 'Puede inscribirse y resolver retos'
             ]
