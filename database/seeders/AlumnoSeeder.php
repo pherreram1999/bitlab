@@ -13,7 +13,7 @@ class AlumnoSeeder extends Seeder
     public function run(): void
     {
         // 1. Buscamos el rol 'Alumno' (Coincide con tu AlumnoGruposSeeder)
-        $rolAlumno = Rol::where('nombre', 'Estudiante')->first();
+        $rolAlumno = Rol::where('nombre', 'ALUMNO')->first();
 
         if (!$rolAlumno) {
             $this->command->error('❌ No se encontró el rol "Alumno".');
