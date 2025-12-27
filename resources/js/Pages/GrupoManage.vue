@@ -7,6 +7,7 @@ import {useAxios} from "@/composable/useAxios";
 import {useUser} from "@/composable/useUser";
 import {router} from "@inertiajs/vue3";
 import Medal from "@/Components/Medal.vue";
+import MedalGroup from "@/Components/MedalGroup.vue";
 
 const { axios: client } = useAxios()
 
@@ -24,6 +25,7 @@ enum Tabs {
 }
 
 const miembros = shallowRef([])
+const miembro = ref()
 const retos = shallowRef([])
 
 const tab = ref<Tabs>(Tabs.Retos)
@@ -31,6 +33,12 @@ const tab = ref<Tabs>(Tabs.Retos)
 const getMembers = async () => {
     const {data} = await client.post(`/grupo/${props.grupo.id}/miembros`)
     miembros.value = data
+}
+
+const puntajeMax = async () => {
+    const {data} = await client.post(`/grupo/${props.grupo.id}/miembro/${user.id}`)
+    miembro.value = data
+    console.log(miembro.value)
 }
 
 const getRetos = async () => {
@@ -56,6 +64,7 @@ const select = async (t: Tabs) => {
 
 onBeforeMount(() => {
     getRetos()
+    puntajeMax()
 })
 
 
@@ -78,12 +87,12 @@ const abrirReto = (r: any) => {
                         {{ user.nombre }} {{user.apellido_paterno}} {{user.apellido_materno}}
                     </div>
                     <div class="mt-2 text-md lg:text-lg 2xl:text-2xl font-semibold" :style="{ color: '#FFFFFF' }">
-                        <div>Puntaje total: </div>
-                        <div>Porcentaje promedio: </div>
+                        <div>Puntaje total: {{miembro?.puntos_obtenidos}}</div>
+                        <div>Porcentaje promedio: %{{miembro?.porcentaje_avance}}</div>
                     </div>
                 </div>
-                <div class="pr-2 py-2 lg:pr-4 2xl:pr-10 not-sm:w-full not-sm:flex not-sm:items-center not-sm:justify-center">
-                    <Medal/>
+                <div class="pr-2 py-2 lg:pr-4 2xl:pr-10 not-sm:w-full not-sm:flex not-sm:items-center not-sm:justify-center min-w-fit">
+                    <Medal :porcentaje="miembro?.porcentaje_avance || 0"/>
                 </div>
             </div>
             <div class="rounded-xl overflow-hidden flex items-center mt-4" :style="{ background: '#2B2E36', height: '110px' }">
@@ -122,10 +131,10 @@ const abrirReto = (r: any) => {
         </section>
         <Transition>
             <section v-if="tab === Tabs.Miembros" class="mt-4 space-y-3">
-                <div class="px-6 py-4 bg-white rounded-2xl shadow-sm border border-gray-100 grid items-center gap-4" 
-                     :class="user.rol.clave === 'PROFESOR' ? 'md:grid-cols-3' : 'grid-cols-1'"
+                <div class="px-6 py-4 bg-white rounded-2xl shadow-sm border border-gray-100 grid items-center gap-4"
+                     :class="user.rol.clave === 'PROFESOR' ? 'md:grid-cols-3' : 'grid-cols-2'"
                      v-for="m of miembros" :key="m.id">
-                    
+
                     <!-- Información del Alumno -->
                     <div class="flex items-center gap-4">
                         <div class="size-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-xl border-2 border-orange-200 shrink-0">
@@ -153,12 +162,16 @@ const abrirReto = (r: any) => {
                     </div>
 
                     <!-- Puntaje (Solo Profesor) -->
+                    <div class="grid grid-cols-2">
                     <div v-if="user.rol.clave === 'PROFESOR'" class="flex flex-col md:items-end">
                         <span class="text-xs font-black text-gray-400 uppercase tracking-tighter">Puntos Obtenidos</span>
                         <span class="text-xl font-black text-gray-800">
-                            {{ m.puntos_obtenidos }} 
+                            {{ m.puntos_obtenidos }}
                             <span class="text-gray-300 text-sm font-normal">/ {{ m.total_puntos_grupo }}</span>
                         </span>
+
+                    </div>
+                        <MedalGroup :porcentaje="m?.porcentaje_avance || 0" class="flex items-center justify-end"/>
                     </div>
                 </div>
             </section>

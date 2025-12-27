@@ -77,8 +77,12 @@ function fmtDate(d) {
                             usando el código que te compartió tu profesor.
                         </p>
 
-                        <p v-if="user.rol.clave === 'PROFESOR'">
+                        <p v-else-if="user.rol.clave === 'PROFESOR'">
                             Para crear un grupo da click en botón de +
+                        </p>
+
+                        <p v-else>
+                            a
                         </p>
                     </div>
                 </div>

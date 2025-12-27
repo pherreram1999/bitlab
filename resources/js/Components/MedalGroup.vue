@@ -20,76 +20,54 @@ defineProps<Props>()
 <template>
     <div v-if="porcentaje < 15">
         <div class="flex gap-2 items-center">
-            <img :src="medalBR1" alt="Medalla Bronce 1" class="flex w-25 h-25 sm:w-35 sm:h-35 lg:w-50 lg:h-50 2xl:w-60 2xl:h-60 items-center justify-center min-w-fit">
-
+            <img :src="medalBR1" alt="Medalla Bronce 1" class="flex w-15 h-15 lg:w-20 lg:h-20 2xl:w-25 2xl:h-25 items-center justify-center min-w-fit">
         </div>
-
     </div>
     <div v-else-if="porcentaje >= 15 && porcentaje < 35">
         <div class="flex gap-2 items-center">
-            <img :src="medalBR2" alt="Medalla Bronce 2" class="flex w-25 h-25 sm:w-35 sm:h-35 lg:w-50 lg:h-50 2xl:w-60 2xl:h-60 items-center justify-center min-w-fit">
-
+            <img :src="medalBR2" alt="Medalla Bronce 2" class="flex w-15 h-15 lg:w-20 lg:h-20 2xl:w-25 2xl:h-25 items-center justify-center min-w-fit">
         </div>
-
     </div>
     <div v-else-if="porcentaje >= 35 && porcentaje < 60">
         <div class="flex gap-2 items-center">
-            <img :src="medalBR3" alt="Medalla Bronce 3" class="flex w-25 h-25 sm:w-35 sm:h-35 lg:w-50 lg:h-50 2xl:w-60 2xl:h-60 items-center justify-center min-w-fit">
-
+            <img :src="medalBR3" alt="Medalla Bronce 3" class="flex w-15 h-15 lg:w-20 lg:h-20 2xl:w-25 2xl:h-25 items-center justify-center min-w-fit">
         </div>
-
     </div>
     <div v-else-if="porcentaje >= 60 && porcentaje < 70">
         <div class="flex gap-2 items-center">
-            <img :src="medalSL1" alt="Medalla Plata 1" class="flex w-25 h-25 sm:w-35 sm:h-35 lg:w-50 lg:h-50 2xl:w-60 2xl:h-60 items-center justify-center min-w-fit">
-
+            <img :src="medalSL1" alt="Medalla Plata 1" class="flex w-15 h-15 lg:w-20 lg:h-20 2xl:w-25 2xl:h-25 items-center justify-center min-w-fit">
         </div>
-
     </div>
     <div v-else-if="porcentaje >= 70 && porcentaje < 75">
         <div class="flex gap-2 items-center">
-            <img :src="medalSL2" alt="Medalla Plata 2" class="flex w-25 h-25 sm:w-35 sm:h-35 lg:w-50 lg:h-50 2xl:w-60 2xl:h-60 items-center justify-center min-w-fit">
-
+            <img :src="medalSL2" alt="Medalla Plata 2" class="flex w-15 h-15 lg:w-20 lg:h-20 2xl:w-25 2xl:h-25 items-center justify-center min-w-fit">
         </div>
-
     </div>
     <div v-else-if="porcentaje >= 75 && porcentaje < 80">
         <div class="flex gap-2 items-center">
-            <img :src="medalSL3" alt="Medalla Plata 3" class="flex w-25 h-25 sm:w-35 sm:h-35 lg:w-50 lg:h-50 2xl:w-60 2xl:h-60 items-center justify-center min-w-fit">
-
+            <img :src="medalSL3" alt="Medalla Plata 3" class="flex w-15 h-15 lg:w-20 lg:h-20 2xl:w-25 2xl:h-25 items-center justify-center min-w-fit">
         </div>
-
     </div>
     <div v-else-if="porcentaje >= 80 && porcentaje < 85">
         <div class="flex gap-2 items-center">
-            <img :src="medalGL1" alt="Medalla Oro 1" class="flex w-25 h-25 sm:w-35 sm:h-35 lg:w-50 lg:h-50 2xl:w-60 2xl:h-60 items-center justify-center min-w-fit">
-
+            <img :src="medalGL1" alt="Medalla Oro 1" class="flex w-15 h-15 lg:w-20 lg:h-20 2xl:w-25 2xl:h-25 items-center justify-center min-w-fit">
         </div>
-
     </div>
     <div v-else-if="porcentaje >= 85 && porcentaje < 90">
         <div class="flex gap-2 items-center">
-            <img :src="medalGL2" alt="Medalla Oro 2" class="flex w-25 h-25 sm:w-35 sm:h-35 lg:w-50 lg:h-50 2xl:w-60 2xl:h-60 items-center justify-center min-w-fit">
-
+            <img :src="medalGL2" alt="Medalla Oro 2" class="flex w-15 h-15 lg:w-20 lg:h-20 2xl:w-25 2xl:h-25 items-center justify-center min-w-fit">
         </div>
-
     </div>
     <div v-else-if="porcentaje >= 90 && porcentaje < 98">
         <div class="flex gap-2 items-center">
-            <img :src="medalGL3" alt="Medalla Oro 3" class="flex w-25 h-25 sm:w-35 sm:h-35 lg:w-50 lg:h-50 2xl:w-60 2xl:h-60 items-center justify-center min-w-fit">
-
+            <img :src="medalGL3" alt="Medalla Oro 3" class="flex w-15 h-15 lg:w-20 lg:h-20 2xl:w-25 2xl:h-25 items-center justify-center min-w-fit">
         </div>
-
     </div>
     <div v-else-if="porcentaje >= 98 && porcentaje <= 100">
         <div class="flex gap-2 items-center">
-            <img :src="medalInf" alt="Medalla Infinita" class="flex w-25 h-25 sm:w-35 sm:h-35 lg:w-50 lg:h-50 2xl:w-60 2xl:h-60 items-center justify-center min-w-fit">
-
+            <img :src="medalInf" alt="Medalla Infinita" class="flex w-15 h-15 lg:w-20 lg:h-20 2xl:w-25 2xl:h-25 items-center justify-center min-w-fit">
         </div>
-
     </div>
     <div v-else>
-
     </div>
 </template>
-
