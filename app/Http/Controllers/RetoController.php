@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Grupo;
-use App\Models\RealizacionReto;
 use App\Models\Reto;
+use App\Models\RealizacionReto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
+use App\Models\User;
+use App\Models\Grupo;
+use Illuminate\Support\Facades\Auth;
+use Barryvdh\Snappy\Facades\SnappyPdf;
 use Carbon\Carbon;
 
 class RetoController extends Controller
@@ -56,80 +59,19 @@ class RetoController extends Controller
 
 
         public function show($id){
-
-
             $reto = Reto::findOrFail($id);
-
-
             $intentosPreviosData = RealizacionReto::where('usuario_id', auth()->id())
-
-
                 ->where('reto_id', $id)
-
-
                 ->get();
-
-
-                
-
-
                     $intentosPrevios = $intentosPreviosData->count();
-
-
-                
-
-
                     $mejorCalificacion = $intentosPreviosData->max('calificacion') ?? 0;
-
-
-                
-
-
                     $yaTerminado = $intentosPreviosData->where('calificacion', '>=', $reto->puntaje)->isNotEmpty();
-
-
-                
-
-
-            
-
-
-                
-
-
                     return Inertia::render('RetoShow',[
-
-
-                
-
-
                         'reto'=>$reto,
-
-
-                
-
-
                         'intentos_previos' => $intentosPrevios,
-
-
-                
-
-
                         'mejor_calificacion' => $mejorCalificacion,
-
-
-                
-
-
                         'ya_terminado' => $yaTerminado
-
-
-                
-
-
                     ]);
-
-
         }
 
     public function guardarRealizacionReto(Request $request)
@@ -138,6 +80,7 @@ class RetoController extends Controller
             'reto_id' => 'required|exists:retos,id',
             'aciertos' => 'required|integer|min:0',
             'respuestas' => 'required|array',
+            'tiempo_tomado' => 'required',
         ]);
 
         $reto = Reto::findOrFail($validated['reto_id']);
@@ -194,8 +137,92 @@ class RetoController extends Controller
             'fecha_realizacion' => Carbon::now(),
             'respuesta' => $validated['respuestas'],
             'calificado' => true,
+            'tiemṕo_tomado' => $validated['tiempo_tomado'],
         ]);
 
         return back()->with('success', 'Reto guardado correctamente');
+    }
+    private function calcularEstadisticas($retoId)
+    {
+        // 1. Necesitamos el reto para saber el puntaje total
+        $reto = Reto::findOrFail($retoId);
+
+        $realizaciones = RealizacionReto::with('user')
+            ->where('reto_id', $retoId)
+            ->where('es_mejor_intento', true)
+            ->get();
+
+        if ($realizaciones->isEmpty()) {
+            return null;
+        }
+
+        // 2. Promedio de Calificación
+        $promedioCalificacion = $realizaciones->avg('calificacion');
+
+        // 3. Promedio de Tiempo
+        // Convertimos cada tiempo (HH:MM:SS) a segundos para promediar
+        $promedioSegundos = $realizaciones->map(function ($r) {
+            if (!$r->tiempo_tomado) return 0;
+            // Parseamos el tiempo. Asumiendo formato H:i:s
+            return Carbon::parse($r->tiempo_tomado)->secondsSinceMidnight();
+        })->avg();
+
+        // Convertimos el promedio de segundos de vuelta a H:i:s
+        $promedioTiempo = gmdate('H:i:s', (int)$promedioSegundos);
+        $totalAlumnos = $realizaciones->count();
+        // CALCULO DINÁMICO: El 60% del puntaje total del reto
+        $puntajeMinimoAprobatorio = $reto->puntaje * 0.60;
+        // Contamos cuántos tienen una calificación mayor o igual al mínimo
+        $aprobados = $realizaciones->where('calificacion', '>=', $puntajeMinimoAprobatorio)->count();
+        $reprobados = $totalAlumnos - $aprobados;
+
+        return [
+            'total_alumnos' => $totalAlumnos,
+            'promedio_calificacion' => round($promedioCalificacion, 2),
+            'promedio_tiempo' => $promedioTiempo,
+            'aprobados' => $aprobados,
+            'reprobados' => $reprobados,
+            'detalle_alumnos' => $realizaciones
+        ];
+    }
+
+    public function reporte($id)
+    {
+        $reto = Reto::with('grupo')->findOrFail($id);
+
+        if ($reto->grupo->usuario_id !== Auth::id()) {
+            abort(403);
+        }
+        /** @var User $user */
+        $user = Auth::user();
+        $gruposCreados = Grupo::where('usuario_id', $user->id)->orderBy('created_at', 'desc')->get();
+        $gruposInscritos = $user->grupos()->orderBy('created_at', 'desc')->get();
+        // Fusionamos para el sidebar
+        $grupos = $gruposCreados->merge($gruposInscritos)->unique('id')->values();
+
+        $estadisticas = $this->calcularEstadisticas($id);
+
+        return Inertia::render('Retos/ReporteReto', [
+            'reto' => $reto,
+            'stats' => $estadisticas,
+            'grupos' => $grupos
+        ]);
+    }
+    public function descargarPdf($id)
+    {
+        $reto = Reto::with('grupo')->findOrFail($id);
+
+        if ($reto->grupo->usuario_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $estadisticas = $this->calcularEstadisticas($id);
+        $pdf = SnappyPdf::loadView('pdf.reporte_reto', [
+            'reto' => $reto,
+            'stats' => $estadisticas,
+            'fecha' => now()->format('d-m-Y')
+        ]);
+
+        return $pdf->download('reporte_reto_{$reto->clave}.pdf');
     }
 }

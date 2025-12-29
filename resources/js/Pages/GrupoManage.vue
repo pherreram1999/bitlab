@@ -8,7 +8,6 @@ import {useUser} from "@/composable/useUser";
 import {router} from "@inertiajs/vue3";
 import Medal from "@/Components/Medal.vue";
 import MedalGroup from "@/Components/MedalGroup.vue";
-// --- NUEVOS IMPORTS PARA EL MODAL ---
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import DangerButton from "@/Components/DangerButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
@@ -34,8 +33,6 @@ const miembros = shallowRef([])
 const miembro = ref()
 const retos = shallowRef([])
 const tab = ref<Tabs>(Tabs.Retos)
-
-// --- LÓGICA PARA ELIMINAR ALUMNO ---
 const confirmingRemoval = ref(false);
 const studentToRemove = ref(null);
 
@@ -59,8 +56,6 @@ const executeRemoval = () => {
         preserveScroll: true,
         onSuccess: () => {
             closeModal();
-            // IMPORTANTE: Volvemos a pedir los miembros para actualizar la lista
-            // ya que 'miembros' no es una prop, sino un estado local.
             getMembers();
         }
     });
@@ -68,8 +63,6 @@ const executeRemoval = () => {
 // -----------------------------------
 
 const getMembers = async () => {
-    // Nota: Asegúrate de que tu backend responda a esto.
-    // Si usas el código anterior, POST está bien, aunque usualmente es GET.
     const {data} = await client.post(`/grupo/${props.grupo.id}/miembros`)
     miembros.value = data
 }
@@ -173,11 +166,10 @@ const abrirReto = (r: any) => {
 
         <Transition>
             <section v-if="tab === Tabs.Miembros" class="mt-4 space-y-3">
-                <div class="px-6 py-4 bg-white rounded-2xl shadow-sm border border-gray-100 grid items-center gap-4"
-                     :class="user.rol.clave === 'PROFESOR' ? 'md:grid-cols-12' : 'grid-cols-2'"
+                <div class="px-6 py-4 bg-white rounded-2xl shadow-sm border border-gray-100 grid items-center gap-4 grid-cols-2 md:grid-cols-12"
                      v-for="m of miembros" :key="m.id">
 
-                    <div class="flex items-center gap-4" :class="user.rol.clave === 'PROFESOR' ? 'col-span-12 md:col-span-4' : 'col-span-1'">
+                    <div class="flex items-center gap-4 col-span-2 md:col-span-4">
                         <div class="size-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-xl border-2 border-orange-200 shrink-0">
                             {{ m.nombre.charAt(0) }}{{ m.apellido_paterno.charAt(0) }}
                         </div>
@@ -185,13 +177,13 @@ const abrirReto = (r: any) => {
                             <p class="font-black text-gray-800 text-lg leading-tight truncate">
                                 {{ m.nombre }} {{ m.apellido_paterno }} {{ m.apellido_materno }}
                             </p>
-                            <p v-if="user.rol.clave === 'PROFESOR'" class="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">
+                            <p class="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">
                                 Matrícula: {{ m.matricula }}
                             </p>
                         </div>
                     </div>
 
-                    <div v-if="user.rol.clave === 'PROFESOR'" class="w-full col-span-12 md:col-span-4">
+                    <div class="w-full col-span-2 md:col-span-4">
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-xs font-black text-gray-400 uppercase">Avance</span>
                             <span class="text-sm font-black text-orange-600">{{ m.porcentaje_avance }}%</span>
@@ -201,20 +193,20 @@ const abrirReto = (r: any) => {
                         </div>
                     </div>
 
-                    <div v-if="user.rol.clave === 'PROFESOR'" class="col-span-10 md:col-span-3 flex items-center justify-between md:justify-end gap-4">
+                    <div class="col-span-2 md:col-span-3 flex items-center justify-between md:justify-end gap-4">
                         <div class="flex flex-col md:items-end">
-                            <span class="text-xs font-black text-gray-400 uppercase tracking-tighter">Puntos Obtenidos</span>
+                            <span class="text-xs font-black text-gray-400 uppercase tracking-tighter">Puntos</span>
                             <span class="text-xl font-black text-gray-800">
-                                {{ m.puntos_obtenidos }}
-                                <span class="text-gray-300 text-sm font-normal">/ {{ m.total_puntos_grupo }}</span>
-                            </span>
+                        {{ m.puntos_obtenidos }}
+                        <span class="text-gray-300 text-sm font-normal">/ {{ m.total_puntos_grupo }}</span>
+                    </span>
                         </div>
                         <MedalGroup :porcentaje="m?.porcentaje_avance || 0" class="flex items-center justify-end"/>
                     </div>
 
-                    <div v-if="user.rol.clave === 'PROFESOR'" class="col-span-2 md:col-span-1 flex justify-end">
+                    <div class="col-span-2 md:col-span-1 flex justify-end">
                         <button
-                            v-if="grupo.usuario_id === user.id"
+                            v-if="user.rol.clave === 'PROFESOR' && grupo.usuario_id === user.id"
                             @click="confirmRemoval(m)"
                             class="flex items-center justify-center w-9 h-9 rounded-full bg-gray-700 hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 shadow-sm"
                             title="Eliminar alumno"
@@ -226,26 +218,47 @@ const abrirReto = (r: any) => {
                         </button>
                     </div>
 
-                    <div v-if="user.rol.clave !== 'PROFESOR'" class="col-span-1 flex justify-end">
-                    </div>
-
                 </div>
             </section>
 
             <section class="mt-4" v-else>
-                <div @click.prevent="abrirReto(r)"
-                     class="px-4 py-2  bg-white my-2 rounded-lg flex justify-between
-                    hover:shadow-lg cursor-pointer transition-all transform hover:-translate-y-0.5"
-                     v-for="r of retos">
-                    <h2 class="font-semibold px-4 py-2">{{ r.titulo }}</h2>
-                    <time>{{ r.fecha_limite }}</time>
-                    <div>
+                <div
+                    v-for="r of retos"
+                    :key="r.id"
+                    class="bg-white my-3 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between items-center p-4 transition-all hover:shadow-md"
+                >
+                    <div
+                        @click.prevent="abrirReto(r)"
+                        class="flex-1 cursor-pointer w-full sm:w-auto mb-3 sm:mb-0"
+                    >
+                        <h2 class="font-bold text-lg text-gray-800">{{ r.titulo }}</h2>
+                        <div class="flex items-center gap-2 text-sm text-gray-500 mt-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                            <time>Vence: {{ r.fecha_limite }}</time>
+                        </div>
+                    </div>
+
+                    <div v-if="user.rol.clave === 'PROFESOR'" class="flex items-center gap-3">
+
+                        <Link
+                            :href="route('retos.reporte', r.id)"
+                            class="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors font-semibold text-sm"
+                            title="Ver Estadísticas y Reporte"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
+                            </svg>
+                            Reporte
+                        </Link>
 
                     </div>
                 </div>
+
                 <Link class="fabBtn" v-if="user.rol.clave === 'PROFESOR'"
                       :href="`/retos/${grupo.id}/crear`"
-                      aria-label="Unirse a un grupo">
+                      aria-label="Crear reto">
                     <span class="plusV"></span>
                     <span class="plusH"></span>
                 </Link>

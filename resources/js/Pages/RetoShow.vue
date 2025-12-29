@@ -3,9 +3,10 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import nibbitAsk from "@/img/nibbit_ask.webp";
 import nibbitHappy from "@/img/Nibbit_Happy.webp";
 import nibbitSad from "@/img/Nibbit_Sad.webp";
-import {computed, onUnmounted, ref} from "vue";
+import {computed, onUnmounted, ref,onMounted} from "vue";
 import { Link } from '@inertiajs/vue3';
 import {useAxios} from "@/composable/useAxios";
+import { useForm } from '@inertiajs/vue3';
 
 const {axios} = useAxios()
 
@@ -45,6 +46,8 @@ const alreadyFinished = ref(props.ya_terminado);
 const mejorCalificacion = ref(props.mejor_calificacion);
 const timeLeft = ref(0);
 let timerInterval: any = null;
+const startTime = ref<Date | null>(null);
+
 
 // Reactivos con estado de respuesta del alumno
 const reactivos = ref(props.reto.opciones.map(op => ({...op, respuesta: null})));
@@ -85,6 +88,7 @@ const currentScore = computed(() => {
 // Métodos
 const startReto = () => {
     hasStarted.value = true;
+    startTime.value=new Date();
     timeLeft.value = props.reto.tiempo_limite * 60;
     timerInterval = setInterval(() => {
         if (timeLeft.value > 0) {
@@ -94,12 +98,26 @@ const startReto = () => {
         }
     }, 1000);
 };
+const getElapsedTime = () => {
+    if (!startTime.value) return "00:00:00";
+
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - startTime.value.getTime()) / 1000);
+
+    const hours = Math.floor(diffInSeconds / 3600);
+    const minutes = Math.floor((diffInSeconds % 3600) / 60);
+    const seconds = diffInSeconds % 60;
+
+    return [hours, minutes, seconds]
+        .map(v => v.toString().padStart(2, '0'))
+        .join(':');
+};
 
 const finishReto = () => {
     clearInterval(timerInterval);
     isFinished.value = true;
     attemptsMade.value++;
-    
+
     if (currentScore.value > mejorCalificacion.value) {
         mejorCalificacion.value = currentScore.value;
     }
@@ -127,7 +145,8 @@ const saveResult = () => {
     const data = {
         reto_id: props.reto.id,
         aciertos: correctCount.value,
-        respuestas: respuestas
+        respuestas: respuestas,
+        tiempo_tomado: getElapsedTime()
     }
 
     axios.post(`/reto/guardar/realizacion`, data)
