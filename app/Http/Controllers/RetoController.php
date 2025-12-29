@@ -60,18 +60,24 @@ class RetoController extends Controller
 
         public function show($id){
             $reto = Reto::findOrFail($id);
+            $ahora = Carbon::now();
+            $fechaLimite = Carbon::parse($reto->fecha_limite);
+            $estaVencido =$ahora->greaterThan($fechaLimite);
+
             $intentosPreviosData = RealizacionReto::where('usuario_id', auth()->id())
                 ->where('reto_id', $id)
                 ->get();
-                    $intentosPrevios = $intentosPreviosData->count();
-                    $mejorCalificacion = $intentosPreviosData->max('calificacion') ?? 0;
-                    $yaTerminado = $intentosPreviosData->where('calificacion', '>=', $reto->puntaje)->isNotEmpty();
-                    return Inertia::render('RetoShow',[
-                        'reto'=>$reto,
-                        'intentos_previos' => $intentosPrevios,
-                        'mejor_calificacion' => $mejorCalificacion,
-                        'ya_terminado' => $yaTerminado
-                    ]);
+
+            $intentosPrevios = $intentosPreviosData->count();
+            $mejorCalificacion = $intentosPreviosData->max('calificacion') ?? 0;
+            $yaTerminado = $intentosPreviosData->where('calificacion', '>=', $reto->puntaje)->isNotEmpty();
+            return Inertia::render('RetoShow', [
+                'reto' => $reto,
+                'intentos_previos' => $intentosPrevios,
+                'mejor_calificacion' => $mejorCalificacion,
+                'ya_terminado' => $yaTerminado,
+                'esta_vencido' => $estaVencido
+            ]);
         }
 
     public function guardarRealizacionReto(Request $request)
@@ -84,6 +90,12 @@ class RetoController extends Controller
         ]);
 
         $reto = Reto::findOrFail($validated['reto_id']);
+        $ahora = Carbon::now();
+        $fechaLimite = Carbon::parse($reto->fecha_limite);
+        if ($ahora->greaterThan($fechaLimite->addMinutes(1))) {
+            return back()->withErrors(['error' => 'El tiempo límite para enviar este reto ha expirado.']);
+        }
+
         $userId = auth()->id();
 
         // 1. Obtener intentos previos para calcular el número de intento actual

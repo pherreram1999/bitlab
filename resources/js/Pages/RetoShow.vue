@@ -34,7 +34,7 @@ interface Reto {
     opciones: RetoOpcion[];
 }
 
-const props = defineProps<{ reto: Reto, intentos_previos: number, ya_terminado: boolean, mejor_calificacion: number }>()
+const props = defineProps<{ reto: Reto, intentos_previos: number, ya_terminado: boolean, mejor_calificacion: number, esta_vencido:boolean }>()
 
 // Estados
 const hasStarted = ref(false);
@@ -69,7 +69,11 @@ const formattedTime = computed(() => {
     return `${m}:${s}`;
 });
 
-const canRetry = computed(() => !alreadyFinished.value && attemptsMade.value < props.reto.max_intentos);
+const canRetry = computed(() => {
+    return !alreadyFinished
+        && attemptsMade.value < props.reto.max_intentos
+        && !props.esta_vencido;
+});
 
 const isPerfectScore = computed(() => correctCount.value === reactivos.value.length);
 
@@ -179,11 +183,17 @@ onUnmounted(() => clearInterval(timerInterval));
                         </div>
                     </div>
                     <template v-if="canRetry">
-                        <button @click="startReto" class="w-full py-4 bg-orange-600 text-white rounded-2xl font-bold text-xl hover:bg-orange-700 transition shadow-lg shadow-orange-200 mb-4">
+                        <button @click="startReto" class="w-full py-4 bg-orange-600 ...">
                             Comenzar Ahora
                         </button>
                     </template>
-                    <div v-else class="w-full py-4 bg-gray-100 text-gray-400 rounded-2xl font-bold text-xl border border-gray-200 cursor-not-allowed mb-4">
+
+                    <div v-else-if="esta_vencido" class="w-full py-4 bg-red-50 text-red-600 rounded-2xl font-bold text-xl border border-red-100 flex flex-col items-center justify-center mb-4">
+                        <span>📅 Reto Vencido</span>
+                        <span class="text-sm font-normal text-red-400 mt-1">La fecha límite fue: {{ reto.fecha_limite }}</span>
+                    </div>
+
+                    <div v-else class="w-full py-4 bg-gray-100 text-gray-400 ...">
                         🚫 {{ alreadyFinished ? 'Reto completado' : 'Intentos agotados' }}
                     </div>
 
