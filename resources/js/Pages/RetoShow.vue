@@ -3,9 +3,10 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import nibbitAsk from "@/img/nibbit_ask.webp";
 import nibbitHappy from "@/img/Nibbit_Happy.webp";
 import nibbitSad from "@/img/Nibbit_Sad.webp";
-import {computed, onUnmounted, ref} from "vue";
+import {computed, onUnmounted, ref,onMounted} from "vue";
 import { Link } from '@inertiajs/vue3';
 import {useAxios} from "@/composable/useAxios";
+import { useForm } from '@inertiajs/vue3';
 
 const {axios} = useAxios()
 
@@ -33,7 +34,7 @@ interface Reto {
     opciones: RetoOpcion[];
 }
 
-const props = defineProps<{ reto: Reto, intentos_previos: number, ya_terminado: boolean, mejor_calificacion: number }>()
+const props = defineProps<{ reto: Reto, intentos_previos: number, ya_terminado: boolean, mejor_calificacion: number, esta_vencido:boolean }>()
 
 // Estados
 const hasStarted = ref(false);
@@ -45,6 +46,8 @@ const alreadyFinished = ref(props.ya_terminado);
 const mejorCalificacion = ref(props.mejor_calificacion);
 const timeLeft = ref(0);
 let timerInterval: any = null;
+const startTime = ref<Date | null>(null);
+
 
 // Reactivos con estado de respuesta del alumno
 const reactivos = ref(props.reto.opciones.map(op => ({...op, respuesta: null})));
@@ -66,7 +69,11 @@ const formattedTime = computed(() => {
     return `${m}:${s}`;
 });
 
-const canRetry = computed(() => !alreadyFinished.value && attemptsMade.value < props.reto.max_intentos);
+const canRetry = computed(() => {
+    return !alreadyFinished
+        && attemptsMade.value < props.reto.max_intentos
+        && !props.esta_vencido;
+});
 
 const isPerfectScore = computed(() => correctCount.value === reactivos.value.length);
 
@@ -85,6 +92,7 @@ const currentScore = computed(() => {
 // Métodos
 const startReto = () => {
     hasStarted.value = true;
+    startTime.value=new Date();
     timeLeft.value = props.reto.tiempo_limite * 60;
     timerInterval = setInterval(() => {
         if (timeLeft.value > 0) {
@@ -94,12 +102,26 @@ const startReto = () => {
         }
     }, 1000);
 };
+const getElapsedTime = () => {
+    if (!startTime.value) return "00:00:00";
+
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - startTime.value.getTime()) / 1000);
+
+    const hours = Math.floor(diffInSeconds / 3600);
+    const minutes = Math.floor((diffInSeconds % 3600) / 60);
+    const seconds = diffInSeconds % 60;
+
+    return [hours, minutes, seconds]
+        .map(v => v.toString().padStart(2, '0'))
+        .join(':');
+};
 
 const finishReto = () => {
     clearInterval(timerInterval);
     isFinished.value = true;
     attemptsMade.value++;
-    
+
     if (currentScore.value > mejorCalificacion.value) {
         mejorCalificacion.value = currentScore.value;
     }
@@ -127,7 +149,8 @@ const saveResult = () => {
     const data = {
         reto_id: props.reto.id,
         aciertos: correctCount.value,
-        respuestas: respuestas
+        respuestas: respuestas,
+        tiempo_tomado: getElapsedTime()
     }
 
     axios.post(`/reto/guardar/realizacion`, data)
@@ -160,11 +183,17 @@ onUnmounted(() => clearInterval(timerInterval));
                         </div>
                     </div>
                     <template v-if="canRetry">
-                        <button @click="startReto" class="w-full py-4 bg-orange-600 text-white rounded-2xl font-bold text-xl hover:bg-orange-700 transition shadow-lg shadow-orange-200 mb-4">
+                        <button @click="startReto" class="w-full py-4 bg-orange-600 ...">
                             Comenzar Ahora
                         </button>
                     </template>
-                    <div v-else class="w-full py-4 bg-gray-100 text-gray-400 rounded-2xl font-bold text-xl border border-gray-200 cursor-not-allowed mb-4">
+
+                    <div v-else-if="esta_vencido" class="w-full py-4 bg-red-50 text-red-600 rounded-2xl font-bold text-xl border border-red-100 flex flex-col items-center justify-center mb-4">
+                        <span>📅 Reto Vencido</span>
+                        <span class="text-sm font-normal text-red-400 mt-1">La fecha límite fue: {{ reto.fecha_limite }}</span>
+                    </div>
+
+                    <div v-else class="w-full py-4 bg-gray-100 text-gray-400 ...">
                         🚫 {{ alreadyFinished ? 'Reto completado' : 'Intentos agotados' }}
                     </div>
 

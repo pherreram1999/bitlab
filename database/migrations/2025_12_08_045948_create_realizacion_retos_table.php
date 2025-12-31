@@ -18,6 +18,7 @@ return new class extends Migration
             $table->float('calificacion')->nullable();
             $table->integer('no_intentos')->default(0);
             $table->dateTime('fecha_realizacion')->useCurrent();
+            $table->time('tiempo_tomado')->nullable();
             $table->json('respuesta')->nullable();
             $table->boolean('calificado')->default(false);
             $table->timestamps();

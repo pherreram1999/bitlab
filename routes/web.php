@@ -29,7 +29,11 @@ Route::middleware([
                 ->name('dashboard');
             Route::get('grupo/{id}',[GrupoController::class,'show'])
                 ->name('grupo.show');
-           // Route::post('profesor/{id}/alumnos',[GrupoManageController::class,'getMembers']);
+            Route::delete('/grupos/{grupo}/miembros/{user}', [GrupoController::class, 'removeMember'])
+                ->name('grupos.miembros.destroy');
+            Route::get('/retos/{id}/reporte', [RetoController::class, 'reporte'])->name('retos.reporte');
+            Route::get('/retos/{id}/reporte/pdf', [RetoController::class, 'descargarPdf'])->name('retos.reporte.pdf');
+           // Route::post('profesor/{id}/alumnos',[GrupoManageController::class,'ge tMembers']);
         });
     Route::get('/grupos/crear', [GrupoController::class, 'create'])
         ->name('grupos.create');
@@ -46,7 +50,7 @@ Route::middleware([
     Route::get('/reto/{id}',[RetoController::class,'show']);
     Route::inertia('/construction', 'Construction')->name('construction');
     Route::post('/reto/guardar/realizacion',[RetoController::class,'guardarRealizacionReto']);
-    
+
     // Feedback
     Route::get('/feedback', [FeedbackController::class, 'create'])->name('feedback.create');
     Route::post('/feedback', [FeedbackController::class, 'store'])->name('feedback.store');
