@@ -4,6 +4,7 @@ import ApplicationMark from "@/Components/ApplicationMark.vue";
 import InicioAppLayout from "@/Layouts/InicioAppLayout.vue";
 import AuthenticationCardLogo from "@/Components/AuthenticationCardLogo.vue";
 import { Dropdown, Tooltip, Menu, vTooltip } from 'floating-vue'
+import NibbitHome from "@/Components/NibbitHome.vue";
 </script>
 
 <template>
@@ -42,8 +43,8 @@ import { Dropdown, Tooltip, Menu, vTooltip } from 'floating-vue'
                     </a>
                 </div>
             </div>
-            <AuthenticationCardLogo
-                class="flex h-50 sm:h-70 xl:h-90 w-80 sm:w-120 xl:w-140 justify-center items-center"/>
+            <NibbitHome
+                class="flex h-45 sm:h-70 xl:h-90 w-50 sm:w-120 xl:w-140 justify-center items-center"/>
         </div>
     </InicioAppLayout>
 </template>
