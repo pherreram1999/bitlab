@@ -8,6 +8,7 @@ import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import AxiosInterceptorLayout from "@/Layouts/AxiosInterceptorLayout.vue";
+import AccessibilityMenu from '@/Components/AccessibilityMenu.vue';
 
 defineProps({
     title: String,
@@ -56,6 +57,10 @@ const logout = () => {
                         </div>
 
                         <div class="hidden sm:flex sm:items-center sm:ms-6">
+                            
+                            <!-- Accessibility Menu -->
+                            <AccessibilityMenu />
+
                             <!-- Settings Dropdown -->
                             <div class="ms-3 relative">
                                 <Dropdown align="right" width="48">
@@ -80,6 +85,10 @@ const logout = () => {
                                         <div class="block px-4 py-2 text-xs text-gray-400">
                                             Administracción de cuentas
                                         </div>
+
+                                        <DropdownLink :href="route('feedback.index')" v-if="$page.props.auth.user.rol?.clave === 'ADMIN'">
+                                            Feedback del Sistema
+                                        </DropdownLink>
 
                                         <DropdownLink :href="route('profile.show')">
                                             Perfil

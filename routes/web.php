@@ -52,6 +52,7 @@ Route::middleware([
     Route::post('/reto/guardar/realizacion',[RetoController::class,'guardarRealizacionReto']);
 
     // Feedback
+    Route::get('/feedback/list', [FeedbackController::class, 'index'])->name('feedback.index');
     Route::get('/feedback', [FeedbackController::class, 'create'])->name('feedback.create');
     Route::post('/feedback', [FeedbackController::class, 'store'])->name('feedback.store');
 

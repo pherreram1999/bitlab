@@ -59,3 +59,15 @@
         height: 8px;
     }
 }
+
+/* ACCESIBILIDAD */
+
+/* Tamaños de fuente */
+html.a11y-font-md { font-size: 110%; }
+html.a11y-font-lg { font-size: 125%; }
+html.a11y-font-xl { font-size: 140%; }
+
+/* Modo Alto Contraste (Blanco y Negro forzado) */
+html.a11y-high-contrast {
+    filter: grayscale(100%) contrast(125%);
+}

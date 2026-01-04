@@ -15,8 +15,8 @@ class Feedback extends Model
         'comentarios',
     ];
 
-    public function usuario(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'usuario_id');
     }
 }
