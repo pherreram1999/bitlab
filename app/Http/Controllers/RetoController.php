@@ -62,11 +62,13 @@ class RetoController extends Controller
             $reto = Reto::findOrFail($id);
             $ahora = Carbon::now();
             $fechaLimite = Carbon::parse($reto->fecha_limite);
-            $estaVencido =$ahora->greaterThan($fechaLimite);
+            $estaVencido = $ahora->greaterThan($fechaLimite);
+
 
             $intentosPreviosData = RealizacionReto::where('usuario_id', auth()->id())
                 ->where('reto_id', $id)
                 ->get();
+
 
             $intentosPrevios = $intentosPreviosData->count();
             $mejorCalificacion = $intentosPreviosData->max('calificacion') ?? 0;
@@ -223,8 +225,8 @@ class RetoController extends Controller
     public function descargarPdf($id)
     {
         $reto = Reto::with('grupo')->findOrFail($id);
-
-        if ($reto->grupo->usuario_id !== Auth::id()) {
+        $grupo = $reto->grupo;
+        if ($grupo->usuario_id !== Auth::id()) {
             abort(403);
         }
 
@@ -235,6 +237,10 @@ class RetoController extends Controller
             'fecha' => now()->format('d-m-Y')
         ]);
 
-        return $pdf->download('reporte_reto_{$reto->clave}.pdf');
+
+        return response($pdf->output())->withHeaders([
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => "filename=reporte_{$grupo->clave}_reto_{$reto->id}.pdf"
+        ]);
     }
 }

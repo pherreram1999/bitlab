@@ -7,6 +7,7 @@ import {computed, onUnmounted, ref,onMounted} from "vue";
 import { Link } from '@inertiajs/vue3';
 import {useAxios} from "@/composable/useAxios";
 import { useForm } from '@inertiajs/vue3';
+import { DateTime } from 'luxon';
 
 const {axios} = useAxios()
 
@@ -30,6 +31,7 @@ interface Reto {
     puntaje: number;
     tiempo_limite: number;
     max_intentos: number;
+    fecha_limite: string;
     ayuda: string;
     opciones: RetoOpcion[];
 }
@@ -69,10 +71,21 @@ const formattedTime = computed(() => {
     return `${m}:${s}`;
 });
 
+const isExpired = computed(() => {
+    // Priorizamos lo que diga el servidor, pero también validamos localmente por si el tiempo pasa mientras el alumno está en la página
+    if (props.esta_vencido) return true;
+    if (!props.reto.fecha_limite) return false;
+    
+    const limit = DateTime.fromSQL(props.reto.fecha_limite); 
+    const now = DateTime.now();
+
+    return now > limit;
+});
+
 const canRetry = computed(() => {
-    return !alreadyFinished
+    return !alreadyFinished.value
         && attemptsMade.value < props.reto.max_intentos
-        && !props.esta_vencido;
+        && !isExpired.value;
 });
 
 const isPerfectScore = computed(() => correctCount.value === reactivos.value.length);
@@ -188,7 +201,7 @@ onUnmounted(() => clearInterval(timerInterval));
                         </button>
                     </template>
 
-                    <div v-else-if="esta_vencido" class="w-full py-4 bg-red-50 text-red-600 rounded-2xl font-bold text-xl border border-red-100 flex flex-col items-center justify-center mb-4">
+                    <div v-else-if="isExpired" class="w-full py-4 bg-red-50 text-red-600 rounded-2xl font-bold text-xl border border-red-100 flex flex-col items-center justify-center mb-4">
                         <span>📅 Reto Vencido</span>
                         <span class="text-sm font-normal text-red-400 mt-1">La fecha límite fue: {{ reto.fecha_limite }}</span>
                     </div>

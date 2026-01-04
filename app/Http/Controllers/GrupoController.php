@@ -125,14 +125,12 @@ class GrupoController extends Controller
         $retosIds = $retos->pluck('id');
         $totalPuntosPosibles = $retos->sum('puntaje');
 
-        /** @var User $user */
-        $user = Auth::user();
 
         // 2. Obtener alumnos inscritos
         $alumnos = User::query()
             ->join('inscripciones', 'users.id', '=', 'inscripciones.usuario_id')
             ->where('inscripciones.grupo_id', $id)
-            ->where('users.id', '!=', $user->id) // Excluir al usuario actual (profesor)
+            ->where('users.id', '!=', $grupo->usuario_id) // Excluir al usuario actual (profesor)
             ->where('estado', 1)
             ->select(
                 'users.id',
