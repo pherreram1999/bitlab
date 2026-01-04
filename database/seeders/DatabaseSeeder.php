@@ -41,5 +41,12 @@ class DatabaseSeeder extends Seeder
         $this->call([
             GrupoSeeder::class,
         ]);
+        $this->call([
+            AlumnoGruposSeeder::class,
+        ]);
+        $this->call([
+            RetoSeeder::class,
+            RealizacionSeeder::class,
+        ]);
     }
 }

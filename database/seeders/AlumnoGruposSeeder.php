@@ -5,149 +5,78 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Grupo;
+use App\Models\User;
+use App\Models\Rol;
 
 class AlumnoGruposSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::transaction(function () {
+        // 1. Aseguramos que existe el rol de alumno
+        $rolAlumno = Rol::firstOrCreate(
+            ['nombre' => 'ALUMNO'],
+            ['clave' => 'ALUMNO', 'descripcion' => 'Rol de estudiante']
+        );
 
-            // 1) Roles (si no existen)
-            $rolProfesorId = DB::table('roles')->where('clave', 'PROFESOR')->value('id');
-            if (!$rolProfesorId) {
-                $rolProfesorId = DB::table('roles')->insertGetId([
-                    'clave' => 'PROFESOR',
-                    'nombre' => 'Profesor',
-                    'descripcion' => 'Rol de profesor',
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
+        // 2. Obtenemos TODOS los grupos existentes (creados por GrupoSeeder)
+        $grupos = Grupo::all();
 
-            $rolAlumnoId = DB::table('roles')->where('clave', 'ALUMNO')->value('id');
-            if (!$rolAlumnoId) {
-                $rolAlumnoId = DB::table('roles')->insertGetId([
-                    'clave' => 'ALUMNO',
-                    'nombre' => 'Alumno',
-                    'descripcion' => 'Rol de alumno',
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
+        if ($grupos->isEmpty()) {
+            $this->command->warn('⚠️ No hay grupos para inscribir alumnos. Ejecuta GrupoSeeder primero.');
+            return;
+        }
 
-            // 2) Usuario profesor (si no existe)
-            $profEmail = 'profe@bitlab.test';
-            $profId = DB::table('users')->where('email', $profEmail)->value('id');
+        // 3. Crear o buscar Alumnos
+        $alumnosIds = [];
 
-            if (!$profId) {
-                $profId = DB::table('users')->insertGetId([
-                    'rol_id' => $rolProfesorId,
-                    'nombre' => 'Ana',
-                    'apellido_paterno' => 'García',
-                    'apellido_materno' => 'López',
-                    'matricula' => 900000, // único
-                    'email' => $profEmail,
+        // Creamos 15 alumnos de prueba
+        for ($i = 1; $i <= 15; $i++) {
+            $matricula = 20240000 + $i;
+            $email = "alumno{$i}@bitlab.test";
+
+            $alumno = User::firstOrCreate(
+                ['email' => $email],
+                [
+                    'rol_id' => $rolAlumno->id,
+                    'nombre' => "Alumno {$i}",
+                    'apellido_paterno' => "Paterno",
+                    'apellido_materno' => "Materno",
+                    'matricula' => $matricula,
                     'estado' => 1,
-                    'password' => Hash::make('password'),
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
+                    'password' => Hash::make('12345'), // Contraseña fácil para pruebas
+                ]
+            );
+            $alumnosIds[] = $alumno->id;
+        }
 
-            // 3) Grupos (3 grupos) creados por el profesor
-            $gruposData = [
-                [
-                    'clave' => 'GPO-ISC-01',
-                    'nombre' => 'Algoritmos - Grupo 01',
-                    'portada' => 'portadas/grupo01.jpg',
-                    'descripcion' => 'Grupo de práctica de algoritmos.',
-                ],
-                [
-                    'clave' => 'GPO-ISC-02',
-                    'nombre' => 'Bases de Datos - Grupo 02',
-                    'portada' => 'portadas/grupo02.jpg',
-                    'descripcion' => 'Grupo para retos de SQL y modelado.',
-                ],
-                [
-                    'clave' => 'GPO-ISC-03',
-                    'nombre' => 'Redes - Grupo 03',
-                    'portada' => 'portadas/grupo03.jpg',
-                    'descripcion' => 'Grupo para retos de redes y routing.',
-                ],
-            ];
+        // 4. Inscribir alumnos en los grupos existentes
+        // Haremos que cada alumno se inscriba en 1 o 2 grupos al azar
+        $this->command->info("📝 Inscribiendo alumnos en " . $grupos->count() . " grupos existentes...");
 
-            $grupoIds = [];
-            foreach ($gruposData as $g) {
-                $existingId = DB::table('grupos')->where('clave', $g['clave'])->value('id');
-                if ($existingId) {
-                    $grupoIds[] = $existingId;
-                    continue;
-                }
+        foreach ($alumnosIds as $alumnoId) {
+            // Seleccionamos grupos aleatorios para este alumno (entre 1 y 3 grupos)
+            $gruposAleatorios = $grupos->random(rand(1, min(3, $grupos->count())));
 
-                $grupoIds[] = DB::table('grupos')->insertGetId([
-                    'usuario_id' => $profId,
-                    'clave' => $g['clave'],
-                    'nombre' => $g['nombre'],
-                    'portada' => $g['portada'],
-                    'descripcion' => $g['descripcion'],
-                    'concluido' => 0,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
+            foreach ($gruposAleatorios as $grupo) {
+                // Verificar si ya está inscrito para no duplicar
+                $existe = DB::table('inscripciones')
+                    ->where('grupo_id', $grupo->id)
+                    ->where('usuario_id', $alumnoId)
+                    ->exists();
 
-            // 4) Crear 10 alumnos (si no existen) y guardamos sus IDs
-            $alumnos = [];
-            for ($i = 1; $i <= 10; $i++) {
-                $matricula = 20250000 + $i; // único
-                $email = "alumno{$i}@bitlab.test";
-
-                $id = DB::table('users')->where('email', $email)->value('id');
-                if (!$id) {
-                    $id = DB::table('users')->insertGetId([
-                        'rol_id' => $rolAlumnoId,
-                        'nombre' => "Alumno{$i}",
-                        'apellido_paterno' => "Paterno{$i}",
-                        'apellido_materno' => "Materno{$i}",
-                        'matricula' => $matricula,
-                        'email' => $email,
-                        'estado' => 1,
-                        'password' => Hash::make('password'),
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                }
-
-                $alumnos[] = $id;
-            }
-
-            // 5) Inscribir a los 10 alumnos repartidos 4-3-3 en los 3 grupos
-            //    (inscripciones: usuario_id, grupo_id, puntos_obtenidos)
-            $reparto = [
-                $grupoIds[0] => array_slice($alumnos, 0, 4),
-                $grupoIds[1] => array_slice($alumnos, 4, 3),
-                $grupoIds[2] => array_slice($alumnos, 7, 3),
-            ];
-
-            foreach ($reparto as $grupoId => $alumnoIds) {
-                foreach ($alumnoIds as $alumnoId) {
-
-                    $yaExiste = DB::table('inscripciones')
-                        ->where('grupo_id', $grupoId)
-                        ->where('usuario_id', $alumnoId)
-                        ->exists();
-
-                    if ($yaExiste) continue;
-
+                if (!$existe) {
                     DB::table('inscripciones')->insert([
                         'usuario_id' => $alumnoId,
-                        'grupo_id' => $grupoId,
-                        'puntos_obtenidos' => 0,
+                        'grupo_id' => $grupo->id,
+                        'puntos_obtenidos' => rand(0, 100),
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
                 }
             }
-        });
+        }
+
+        $this->command->info('✅ Alumnos creados e inscritos correctamente.');
     }
 }
